@@ -1,0 +1,16 @@
+target/
+*.zip
+*.exe
+.idea/
+.vscode/
+*.iml
+.classpath
+.project
+.settings/
+bin/
+*.class
+*.log
+*.tmp
+config.properties
+db.properties
+remote_user.sql

@@ -1,0 +1,60 @@
+IPSMD01|OPD|4.30 PM|Same Day|199.00|199.00|Dental
+IPSMD02|Anterior|||599.00|599.00|Dental
+IPSMD03|Posterior-(Per Tooth)|||1199.00|1199.00|Dental
+IPSMD04|Root Stump/Carious/Broken(Done Surgically)|||1199.00|1199.00|Dental
+IPSMD05|Widom Tooth|||1999.00|1999.00|Dental
+IPSMD06|Alveoloplasty-(Per Arch)|||3999.00|3999.00|Dental
+IPSMD07|Pericoronal Flap Removeal /Gingivectomy/crown Lengthening- (Per Tooth)|||2999.00|2999.00|Dental
+IPSMD08|Scaling|||1199.00|1199.00|Dental
+IPSMD09|GIC Filling|||1299.00|1299.00|Dental
+IPSMD010|Composite Filling|||1249.00|1249.00|Dental
+IPSMD011|Miracle Mix-(Per Tooth)|||1049.00|1049.00|Dental
+IPSMD012|composite With Base|||1599.00|1599.00|Dental
+IPSMD013|Night Guard-(Per ARCH)|||2999.00|2999.00|Dental
+IPSMD014|Hawlys's Orthodontic- (Including Tighting charges per ARCH)|||9999.00|9999.00|Dental
+IPSMD015|Acrylic-Additional RS-200/-(Per Tooth)|||1999.00|1999.00|Dental
+IPSMD016|Flexible- For Plate Additional RS-500/-(Per Tooth)|||8999.00|8999.00|Dental
+IPSMD017|CD-Complete Dentures|||19999.00|19999.00|Dental
+IPSMP01|Back Pain Therapy|||599.00|599.00|Physiotherapy
+IPSMP02|Neck Pain Therapy|||599.00|599.00|Physiotherapy
+IPSMP03|Knee Pain Therapy|||599.00|599.00|Physiotherapy
+IPSMP04|Shoulder Pain Therapy|||599.00|599.00|Physiotherapy
+IPSMP05|Post Facture,Rehabilitation|||599.00|599.00|Physiotherapy
+IPSMP06|Sport Injury Physiotherapy|||599.00|599.00|Physiotherapy
+IPSMP07|Postural Correction therapy|||599.00|599.00|Physiotherapy
+IPSMP08|Sciatica Pain management|||599.00|599.00|Physiotherapy
+IPSMP09|Ceervical & Lumbar spondylosis|||599.00|599.00|Physiotherapy
+IPSMP010|Muscle Strengthening|||599.00|599.00|Physiotherapy
+IPSMD021|Metal -(Per Tooth)|||2399.00|2399.00|Dental
+IPSMD022|PFM - (Per Tooth)|||3999.00|3999.00|Dental
+IPSMD023|Zirconia -(Per Tooth)|||7999.00|7999.00|Dental
+IPSMD024|Crown Recementation -(Per Tooth)|||399.00|399.00|Dental
+IPSMD025|Bleaching -(Full Mouth)|||15999.00|15999.00|Dental
+IPSMD026|Abscess Drainage|||999.00|999.00|Dental
+IPSMD027|Enameloplasty - (Per ARCH)|||399.00|399.00|Dental
+IPSMD028|Claning|||1199.00|1199.00|Dental
+IPSMD029|KOC (Excluding Crown)|||31999.00|31999.00|Dental
+IPSMD030|S-FIX (Excluding Crown)|||35999.00|35999.00|Dental
+IPSMD031|Osstem (Excluding Crown)|||43999.00|43999.00|Dental
+IPSMX01|Head AP/LAT|||800.00|800.00|X-Ray
+IPSMX02|Chest AP & PA|||500.00|500.00|X-Ray
+IPSMX03|Chest AP/ LAT & OBL|||800.00|800.00|X-Ray
+IPSMX04|C-Spine AP / LAT|||800.00|800.00|X-Ray
+IPSMX05|D-Spine AP/LAT|||800.00|800.00|X-Ray
+IPSMX06|L/S - Spine AP / LAT|||800.00|800.00|X-Ray
+IPSMX07|Shoulder AP & AP / LAT|||400.00|400.00|X-Ray
+IPSMX08|Clavicle AP|||800.00|800.00|X-Ray
+IPSMX09|ARM AP / LAT|||800.00|800.00|X-Ray
+IPSMX010|FOREARM AP / LAT|||800.00|800.00|X-Ray
+IPSMX011|Elbow AP / LAT|||800.00|800.00|X-Ray
+IPSMX012|Wrist & hand AP / LAT|||800.00|800.00|X-Ray
+IPSMX013|Abdomen|||500.00|500.00|X-Ray
+IPSMX014|Pelvic|||500.00|500.00|X-Ray
+IPSMX015|LEG AP / LAT|||800.00|800.00|X-Ray
+IPSMX016|Knee AP / LAT & Both Knee AP /LAT|||800.00|800.00|X-Ray
+IPSMX017|Ankle & Foot AP / LAT|||800.00|800.00|X-Ray
+IPSMX018|HSG Normal / With anesthesia|||6000.00|6000.00|X-Ray
+IPSMX019|IVP|||10000.00|10000.00|X-Ray
+IPSMX020|Barium Satedy's|||10000.00|10000.00|X-Ray
+IPSMX021|RGU|||10000.00|10000.00|X-Ray
+IPSMX022|MCU|||10000.00|10000.00|X-Ray
