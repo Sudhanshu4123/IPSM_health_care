@@ -258,6 +258,52 @@ public class DatabaseManager {
             } catch (SQLException e) {
             }
 
+            // NEW: Staff Tables
+            stmt.execute(
+                    "CREATE TABLE IF NOT EXISTS branches (branch_id INT AUTO_INCREMENT PRIMARY KEY, branch_name VARCHAR(100) UNIQUE, short_code VARCHAR(10))");
+            stmt.execute(
+                    "INSERT IGNORE INTO branches (branch_name, short_code) VALUES ('Main Branch', 'HO'), ('Delhi', 'DL'), ('Noida', 'ND')");
+
+            stmt.execute("CREATE TABLE IF NOT EXISTS staff (" +
+                    "staff_id VARCHAR(50) PRIMARY KEY, " +
+                    "staff_name VARCHAR(255) NOT NULL, " +
+                    "father_name VARCHAR(255), " +
+                    "designation VARCHAR(100), " +
+                    "branch VARCHAR(100), " +
+                    "doj VARCHAR(20), " +
+                    "dob VARCHAR(20), " +
+                    "mobile VARCHAR(15), " +
+                    "alt_mobile VARCHAR(15), " +
+                    "aadhar VARCHAR(20), " +
+                    "address TEXT, " +
+                    "corr_address TEXT, " +
+                    "gross_salary DECIMAL(10, 2), " +
+                    "cl_forwarded INT, " +
+                    "email VARCHAR(100), " +
+                    "marital_status VARCHAR(20), " +
+                    "wife_name VARCHAR(255), " +
+                    "children_count INT, " +
+                    "state VARCHAR(100), " +
+                    "pincode VARCHAR(10), " +
+                    "gender VARCHAR(10), " +
+                    "languages TEXT, " +
+                    "higher_qual VARCHAR(255), " +
+                    "last_increment_date VARCHAR(20), " +
+                    "next_increment_date VARCHAR(20), " +
+                    "status VARCHAR(20) DEFAULT 'Active', " +
+                    "doc_10th TEXT, doc_12th TEXT, doc_bachelor TEXT, doc_master TEXT, doc_phd TEXT, " +
+                    "doc_photo TEXT, doc_resume TEXT, doc_aadhar TEXT, doc_pan TEXT, doc_signature TEXT, " +
+                    "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
+
+            stmt.execute("CREATE TABLE IF NOT EXISTS staff_bank_details (" +
+                    "id INT AUTO_INCREMENT PRIMARY KEY, " +
+                    "staff_id VARCHAR(50), " +
+                    "bank_name VARCHAR(255), " +
+                    "account_number VARCHAR(50), " +
+                    "account_holder VARCHAR(255), " +
+                    "ifsc_code VARCHAR(50), " +
+                    "FOREIGN KEY (staff_id) REFERENCES staff(staff_id) ON DELETE CASCADE)");
+
         } catch (SQLException e) {
             System.err.println("CRITICAL: Database initialization failed: " + e.getMessage());
             e.printStackTrace();
@@ -573,5 +619,143 @@ public class DatabaseManager {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public static List<String> getBranches() {
+        List<String> branches = new ArrayList<>();
+        try (Connection conn = getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT branch_name FROM branches ORDER BY branch_name")) {
+            while (rs.next())
+                branches.add(rs.getString(1));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return branches;
+    }
+
+    public static String getBranchShortCode(String branch) {
+        try (Connection conn = getConnection();
+                PreparedStatement pstmt = conn
+                        .prepareStatement("SELECT short_code FROM branches WHERE branch_name = ?")) {
+            pstmt.setString(1, branch);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next())
+                    return rs.getString(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "ST";
+    }
+
+    public static int getNextStaffSequence(String branch) {
+        try (Connection conn = getConnection();
+                PreparedStatement pstmt = conn.prepareStatement("SELECT COUNT(*) FROM staff WHERE branch = ?")) {
+            pstmt.setString(1, branch);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next())
+                    return rs.getInt(1) + 1;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 1;
+    }
+
+    public static boolean saveStaff(String staffId, String name, String desig, String branch, String doj, double salary,
+            String mobile, String aadhar, String address, String dob, String status, String father,
+            String doc10, String doc12, String bachelor, String master, String phd, String photo,
+            String resume, String aadharDoc, String panDoc, String sig, String email, String marital,
+            String state, String pincode, String altMob, String corrAddr, String wife, String children,
+            String lang, String qual, String lastInc, String nextInc) {
+        try (Connection conn = getConnection()) {
+            String sql = "INSERT INTO staff (staff_id, staff_name, designation, branch, doj, gross_salary, mobile, aadhar, address, dob, status, father_name, "
+                    +
+                    "doc_10th, doc_12th, doc_bachelor, doc_master, doc_phd, doc_photo, doc_resume, doc_aadhar, doc_pan, doc_signature, "
+                    +
+                    "email, marital_status, state, pincode, alt_mobile, corr_address, wife_name, children_count, languages, higher_qual, last_increment_date, next_increment_date) "
+                    +
+                    "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) " +
+                    "ON DUPLICATE KEY UPDATE staff_name=VALUES(staff_name), designation=VALUES(designation), branch=VALUES(branch), gross_salary=VALUES(gross_salary), mobile=VALUES(mobile)";
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, staffId);
+                pstmt.setString(2, name);
+                pstmt.setString(3, desig);
+                pstmt.setString(4, branch);
+                pstmt.setString(5, doj);
+                pstmt.setDouble(6, salary);
+                pstmt.setString(7, mobile);
+                pstmt.setString(8, aadhar);
+                pstmt.setString(9, address);
+                pstmt.setString(10, dob);
+                pstmt.setString(11, status);
+                pstmt.setString(12, father);
+                pstmt.setString(13, doc10);
+                pstmt.setString(14, doc12);
+                pstmt.setString(15, bachelor);
+                pstmt.setString(16, master);
+                pstmt.setString(17, phd);
+                pstmt.setString(18, photo);
+                pstmt.setString(19, resume);
+                pstmt.setString(20, aadharDoc);
+                pstmt.setString(21, panDoc);
+                pstmt.setString(22, sig);
+                pstmt.setString(23, email);
+                pstmt.setString(24, marital);
+                pstmt.setString(25, state);
+                pstmt.setString(26, pincode);
+                pstmt.setString(27, altMob);
+                pstmt.setString(28, corrAddr);
+                pstmt.setString(29, wife);
+                pstmt.setString(30, children);
+                pstmt.setString(31, lang);
+                pstmt.setString(32, qual);
+                pstmt.setString(33, lastInc);
+                pstmt.setString(34, nextInc);
+                return pstmt.executeUpdate() > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static void saveBank(String staffId, String bank, String acc, String holder, String ifsc) {
+        try (Connection conn = getConnection()) {
+            String sql = "INSERT INTO staff_bank_details (staff_id, bank_name, account_number, account_holder, ifsc_code) VALUES (?,?,?,?,?) "
+                    +
+                    "ON DUPLICATE KEY UPDATE bank_name=VALUES(bank_name), account_number=VALUES(account_number), account_holder=VALUES(account_holder), ifsc_code=VALUES(ifsc_code)";
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, staffId);
+                pstmt.setString(2, bank);
+                pstmt.setString(3, acc);
+                pstmt.setString(4, holder);
+                pstmt.setString(5, ifsc);
+                pstmt.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static List<Object[]> getAllStaff() {
+        List<Object[]> staffList = new ArrayList<>();
+        try (Connection conn = getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(
+                        "SELECT s.*, b.bank_name, b.account_number FROM staff s LEFT JOIN staff_bank_details b ON s.staff_id = b.staff_id ORDER BY s.staff_name")) {
+            ResultSetMetaData meta = rs.getMetaData();
+            int cols = meta.getColumnCount();
+            while (rs.next()) {
+                Object[] row = new Object[cols];
+                for (int i = 1; i <= cols; i++)
+                    row[i - 1] = rs.getObject(i);
+                staffList.add(row);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return staffList;
     }
 }

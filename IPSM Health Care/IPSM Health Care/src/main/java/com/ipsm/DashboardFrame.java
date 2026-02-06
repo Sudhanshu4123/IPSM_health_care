@@ -122,7 +122,8 @@ public class DashboardFrame extends JFrame {
         p.setBackground(Color.WHITE);
         p.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(200, 200, 200)));
 
-        String[] menus = { "Registration", "Patient Report", "Invoice", "Payment Details", "Reports" };
+        String[] menus = { "Registration", "Patient Report", "Invoice", "Payment Details", "Reports",
+                "Staff Management" };
         for (String m : menus) {
             // High-level check: if user has ANY permission in this category, show the menu
             if (!hasCategoryAccess(m)) {
@@ -170,6 +171,8 @@ public class DashboardFrame extends JFrame {
                 return session.canRepSummary() || "DOCTOR".equalsIgnoreCase(session.getRole());
             case "Payment Details":
                 return "ADMIN".equalsIgnoreCase(session.getRole()) || session.canRepBusiness();
+            case "Staff Management":
+                return "ADMIN".equalsIgnoreCase(session.getRole()) || session.canRegManage();
             default:
                 return false;
         }
@@ -225,6 +228,9 @@ public class DashboardFrame extends JFrame {
                 break;
             case "Reports":
                 showReportsPopup(source);
+                break;
+            case "Staff Management":
+                new StaffManagementFrame().setVisible(true);
                 break;
             default:
                 JOptionPane.showMessageDialog(this, "Opening " + menuName);
