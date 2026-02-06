@@ -386,6 +386,7 @@ public class StaffManagementFrame extends JFrame {
                     txtChildrenCount.getText().isEmpty() ? "0" : txtChildrenCount.getText(),
                     txtLanguages.getText(), txtHigherQual.getText(), lastIncField.getText(), nextIncField.getText());
 
+            if (ok) {
                 JOptionPane.showMessageDialog(this, "Staff Registered Successfully!");
                 loadStaffData();
                 clearForm();
@@ -393,13 +394,10 @@ public class StaffManagementFrame extends JFrame {
                 JOptionPane.showMessageDialog(this, "Database update failed.", "Error", JOptionPane.ERROR_MESSAGE);
             }
 
-        }catch(
-
-    Exception ex)
-    {
-        ex.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Error saving staff: " + ex.getMessage());
-    }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error saving staff: " + ex.getMessage());
+        }
     }
 
     private void clearForm() {
