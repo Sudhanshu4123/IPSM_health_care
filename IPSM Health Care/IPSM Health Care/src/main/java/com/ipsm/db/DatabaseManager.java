@@ -531,11 +531,14 @@ public class DatabaseManager {
     public static List<String> getInternalDoctorsList() {
         List<String> doctors = new ArrayList<>();
         try (Connection conn = getConnection()) {
-            String sql = "SELECT username FROM users WHERE role = 'DOCTOR' ORDER BY username ASC";
+            String sql = "SELECT s.staff_name FROM staff s " +
+                    "JOIN users u ON s.staff_id = u.staff_id " +
+                    "WHERE u.role = 'DOCTOR' " +
+                    "ORDER BY s.staff_name ASC";
             try (Statement stmt = conn.createStatement();
                     ResultSet rs = stmt.executeQuery(sql)) {
                 while (rs.next())
-                    doctors.add(rs.getString("username"));
+                    doctors.add(rs.getString("staff_name"));
             }
         } catch (SQLException e) {
             System.err.println("Error fetching internal doctors: " + e.getMessage());
@@ -548,8 +551,20 @@ public class DatabaseManager {
         if (name == null || name.isEmpty())
             return null;
         try (Connection conn = getConnection()) {
-            String sql = "SELECT user_id FROM users WHERE username = ? AND role = 'DOCTOR'";
+            String sql = "SELECT u.user_id FROM users u " +
+                    "JOIN staff s ON u.staff_id = s.staff_id " +
+                    "WHERE s.staff_name = ? AND u.role = 'DOCTOR'";
             try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, name);
+                try (ResultSet rs = pstmt.executeQuery()) {
+                    if (rs.next())
+                        return rs.getInt("user_id");
+                }
+            }
+            // Fallback: If not found in staff join, try username check (for legacy/admin
+            // users)
+            String fallbackSql = "SELECT user_id FROM users WHERE username = ? AND role = 'DOCTOR'";
+            try (PreparedStatement pstmt = conn.prepareStatement(fallbackSql)) {
                 pstmt.setString(1, name);
                 try (ResultSet rs = pstmt.executeQuery()) {
                     if (rs.next())
@@ -565,12 +580,15 @@ public class DatabaseManager {
     public static List<String> getInternalDoctorsByDepartment(String dept) {
         List<String> doctors = new ArrayList<>();
         try (Connection conn = getConnection()) {
-            String sql = "SELECT username FROM users WHERE role = 'DOCTOR' AND department = ? ORDER BY username ASC";
+            String sql = "SELECT s.staff_name FROM staff s " +
+                    "JOIN users u ON s.staff_id = u.staff_id " +
+                    "WHERE u.role = 'DOCTOR' AND u.department = ? " +
+                    "ORDER BY s.staff_name ASC";
             try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 pstmt.setString(1, dept);
                 try (ResultSet rs = pstmt.executeQuery()) {
                     while (rs.next())
-                        doctors.add(rs.getString("username"));
+                        doctors.add(rs.getString("staff_name"));
                 }
             }
         } catch (SQLException e) {
