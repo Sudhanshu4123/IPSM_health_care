@@ -103,6 +103,7 @@ public class UserController {
 
         existingUser.setRole(userDetails.getRole());
         existingUser.setDepartment(userDetails.getDepartment());
+        existingUser.setStaffId(userDetails.getStaffId());
         // Update permissions
         existingUser.setRegNew(userDetails.getRegNew());
         existingUser.setRegEdit(userDetails.getRegEdit());

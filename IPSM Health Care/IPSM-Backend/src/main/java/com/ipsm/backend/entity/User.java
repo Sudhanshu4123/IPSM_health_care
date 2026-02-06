@@ -20,6 +20,7 @@ public class User {
     private String role;
 
     private String department;
+    private String staffId; // Link to staff table
 
     // Permissions
     private Boolean regNew = true;
@@ -164,5 +165,13 @@ public class User {
 
     public void setTestStatus(Boolean testStatus) {
         this.testStatus = testStatus;
+    }
+
+    public String getStaffId() {
+        return staffId;
+    }
+
+    public void setStaffId(String staffId) {
+        this.staffId = staffId;
     }
 }
