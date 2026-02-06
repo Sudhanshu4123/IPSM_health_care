@@ -37,7 +37,7 @@ public class StaffManagementFrame extends JFrame {
 
     public StaffManagementFrame() {
         setTitle("Staff Management - IPSM Health Care");
-        setSize(1100, 750);
+        setSize(1100, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
@@ -218,16 +218,6 @@ public class StaffManagementFrame extends JFrame {
         nextIncField = createDateField();
         addFormRow(formPanel, gbc, row++, "Last Increment:", lastIncField, "Next Increment:", nextIncField);
 
-        // Bank Details Section
-        addSectionHeader(formPanel, gbc, "Bank Details", row++);
-        JTextField bankName = createStyledField();
-        JTextField accHolder = createStyledField();
-        addFormRow(formPanel, gbc, row++, "Bank Name:", bankName, "Account Holder:", accHolder);
-
-        JTextField accNum = createStyledField();
-        JTextField ifsc = createStyledField();
-        addFormRow(formPanel, gbc, row++, "Account Number:", accNum, "IFSC Code:", ifsc);
-
         // Document Section
         addSectionHeader(formPanel, gbc, "Documents", row++);
         JPanel docPanel = new JPanel(new GridLayout(5, 2, 10, 10));
@@ -250,7 +240,7 @@ public class StaffManagementFrame extends JFrame {
         btnSave.setBackground(new Color(67, 160, 71));
         btnSave.setForeground(Color.WHITE);
         btnSave.setPreferredSize(new Dimension(180, 40));
-        btnSave.addActionListener(e -> saveStaff(bankName, accNum, accHolder, ifsc));
+        btnSave.addActionListener(e -> saveStaff());
 
         JButton btnClear = new JButton("Clear Form");
         btnClear.setPreferredSize(new Dimension(120, 40));
@@ -354,7 +344,7 @@ public class StaffManagementFrame extends JFrame {
         }
     }
 
-    private void saveStaff(JTextField bank, JTextField acc, JTextField holder, JTextField ifsc) {
+    private void saveStaff() {
         String name = txtStaffName.getText().trim();
         String desig = txtDesignation.getText().trim();
         String mob = txtMobile.getText().trim();
@@ -396,9 +386,6 @@ public class StaffManagementFrame extends JFrame {
                     txtChildrenCount.getText().isEmpty() ? "0" : txtChildrenCount.getText(),
                     txtLanguages.getText(), txtHigherQual.getText(), lastIncField.getText(), nextIncField.getText());
 
-            if (ok) {
-                DatabaseManager.saveBank(txtStaffId.getText(), bank.getText(), acc.getText(), holder.getText(),
-                        ifsc.getText());
                 JOptionPane.showMessageDialog(this, "Staff Registered Successfully!");
                 loadStaffData();
                 clearForm();
@@ -406,10 +393,13 @@ public class StaffManagementFrame extends JFrame {
                 JOptionPane.showMessageDialog(this, "Database update failed.", "Error", JOptionPane.ERROR_MESSAGE);
             }
 
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error saving staff: " + ex.getMessage());
-        }
+        }catch(
+
+    Exception ex)
+    {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error saving staff: " + ex.getMessage());
+    }
     }
 
     private void clearForm() {
