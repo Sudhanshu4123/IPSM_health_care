@@ -261,8 +261,11 @@ public class DatabaseManager {
             // NEW: Staff Tables
             stmt.execute(
                     "CREATE TABLE IF NOT EXISTS branches (branch_id INT AUTO_INCREMENT PRIMARY KEY, branch_name VARCHAR(100) UNIQUE, short_code VARCHAR(10))");
+
+            // Update branches: Replace old with new
+            stmt.execute("DELETE FROM branches"); // Clear old branches
             stmt.execute(
-                    "INSERT IGNORE INTO branches (branch_name, short_code) VALUES ('Main Branch', 'HO'), ('Delhi', 'DL'), ('Noida', 'ND')");
+                    "INSERT IGNORE INTO branches (branch_name, short_code) VALUES ('Uttam Nagar', 'UN'), ('Dwarka', 'DW'), ('Gurugram', 'GG')");
 
             stmt.execute("CREATE TABLE IF NOT EXISTS staff (" +
                     "staff_id VARCHAR(50) PRIMARY KEY, " +
