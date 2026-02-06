@@ -26,11 +26,11 @@ public class StaffManagementFrame extends JFrame {
 
     // Form fields
     private JTextField txtStaffId, txtStaffName, txtFatherName, txtDesignation, txtMobile, txtAltMobile, txtAadhar,
-            txtEmail, txtState, txtPincode, txtGrossSalary, txtClForwarded, txtWifeName, txtChildrenCount, txtLanguages,
+            txtEmail, txtState, txtPincode, txtGrossSalary, txtWifeName, txtChildrenCount, txtLanguages,
             txtHigherQual;
     private JComboBox<String> comboBranch, comboMarital, comboGender;
     private JTextArea areaAddress, areaCorrAddress;
-    private JTextField dojField, dobField, lastIncField, nextIncField;
+    private JTextField dojField, dobField;
     private String[] docPaths = new String[10]; // 0:10th, 1:12th, 2:Photo, 3:Resume, 4:Aadhar, 5:PAN, 6:Signature,
                                                 // 7:Bachelor, 8:Master, 9:PHD
     private JLabel[] docStatusLabels = new JLabel[10];
@@ -207,16 +207,10 @@ public class StaffManagementFrame extends JFrame {
         txtLanguages = createStyledField();
         addFormRow(formPanel, gbc, row++, "Languages Known:", txtLanguages, "", new JLabel());
 
-        // Professional & Bank
+        // Professional & Salary
         addSectionHeader(formPanel, gbc, "Professional & Salary", row++);
         txtGrossSalary = createStyledField();
-        txtClForwarded = createStyledField();
-        setNumericFilter(txtClForwarded, 2);
-        addFormRow(formPanel, gbc, row++, "Gross Salary *:", txtGrossSalary, "CL Forwarded:", txtClForwarded);
-
-        lastIncField = createDateField();
-        nextIncField = createDateField();
-        addFormRow(formPanel, gbc, row++, "Last Increment:", lastIncField, "Next Increment:", nextIncField);
+        addFormRow(formPanel, gbc, row++, "Gross Salary *:", txtGrossSalary, "", new JLabel());
 
         // Document Section
         addSectionHeader(formPanel, gbc, "Documents", row++);
@@ -384,7 +378,7 @@ public class StaffManagementFrame extends JFrame {
                     txtPincode.getText(),
                     txtAltMobile.getText(), areaCorrAddress.getText(), txtWifeName.getText(),
                     txtChildrenCount.getText().isEmpty() ? "0" : txtChildrenCount.getText(),
-                    txtLanguages.getText(), txtHigherQual.getText(), lastIncField.getText(), nextIncField.getText());
+                    txtLanguages.getText(), txtHigherQual.getText(), "", "");
 
             if (ok) {
                 JOptionPane.showMessageDialog(this, "Staff Registered Successfully!");
@@ -412,7 +406,6 @@ public class StaffManagementFrame extends JFrame {
         areaCorrAddress.setText("");
         txtPincode.setText("");
         txtGrossSalary.setText("");
-        txtClForwarded.setText("");
         txtWifeName.setText("");
         txtChildrenCount.setText("");
         txtLanguages.setText("");
