@@ -14,7 +14,6 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -104,9 +103,8 @@ public class StaffManagementFrame extends JFrame {
     }
 
     private void filterStaff() {
-        String query = searchField.getText().toLowerCase();
-        // Simple client-side filtering or reload from DB with LIKE
-        loadStaffData(); // For now just reload
+        // Simple reload from DB
+        loadStaffData();
     }
 
     private JPanel createFormPanel() {
@@ -320,8 +318,9 @@ public class StaffManagementFrame extends JFrame {
         f.setText(new SimpleDateFormat("dd-MM-yyyy").format(new Date()));
         f.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                DatePicker dp = new DatePicker(null); // Simple adaptation
+            public void mousePressed(MouseEvent e) {
+                DatePicker dp = new DatePicker(StaffManagementFrame.this);
+                dp.setVisible(true);
                 String date = dp.getPickedDate();
                 if (!date.isEmpty())
                     f.setText(date);
