@@ -25,10 +25,10 @@ public class StaffManagementFrame extends JFrame {
     private JTextField searchField;
 
     // Form fields
-    private JTextField txtStaffId, txtStaffName, txtFatherName, txtDesignation, txtMobile, txtAltMobile, txtAadhar,
+    private JTextField txtStaffId, txtStaffName, txtFatherName, txtMobile, txtAltMobile, txtAadhar,
             txtEmail, txtState, txtPincode, txtGrossSalary, txtWifeName, txtChildrenCount, txtLanguages,
             txtHigherQual;
-    private JComboBox<String> comboBranch, comboMarital, comboGender;
+    private JComboBox<String> comboBranch, comboMarital, comboGender, comboDepartment;
     private JTextArea areaAddress, areaCorrAddress;
     private JTextField dojField, dobField;
     private String[] docPaths = new String[10]; // 0:10th, 1:12th, 2:Photo, 3:Resume, 4:Aadhar, 5:PAN, 6:Signature,
@@ -59,7 +59,7 @@ public class StaffManagementFrame extends JFrame {
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         searchField = new JTextField(30);
         searchField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        searchField.setBorder(BorderFactory.createTitledBorder("Search Staff (Name/ID/Designation)"));
+        searchField.setBorder(BorderFactory.createTitledBorder("Search Staff (Name/ID/Department)"));
         searchField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
@@ -75,7 +75,7 @@ public class StaffManagementFrame extends JFrame {
         panel.add(searchPanel, BorderLayout.NORTH);
 
         // Table
-        String[] columns = { "ID", "Name", "Designation", "Branch", "Joining Date", "Mobile", "Salary", "Status" };
+        String[] columns = { "ID", "Name", "Department", "Branch", "Joining Date", "Mobile", "Salary", "Status" };
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -145,9 +145,10 @@ public class StaffManagementFrame extends JFrame {
         txtFatherName = createStyledField();
         addFormRow(formPanel, gbc, row++, "Staff Name *:", txtStaffName, "Father's Name:", txtFatherName);
 
-        txtDesignation = createStyledField();
+        comboDepartment = new JComboBox<>(
+                new String[] { "Dental", "Pathology", "Physiotherapy", "Radiology", "Admin", "Other" });
         dojField = createDateField();
-        addFormRow(formPanel, gbc, row++, "Designation *:", txtDesignation, "Date of Joining:", dojField);
+        addFormRow(formPanel, gbc, row++, "Department *:", comboDepartment, "Date of Joining:", dojField);
 
         // Contact & ID
         addSectionHeader(formPanel, gbc, "Contact & Identification", row++);
@@ -340,7 +341,7 @@ public class StaffManagementFrame extends JFrame {
 
     private void saveStaff() {
         String name = txtStaffName.getText().trim();
-        String desig = txtDesignation.getText().trim();
+        String desig = (String) comboDepartment.getSelectedItem();
         String mob = txtMobile.getText().trim();
         String aadhar = txtAadhar.getText().trim();
         String salText = txtGrossSalary.getText().trim();
@@ -397,7 +398,6 @@ public class StaffManagementFrame extends JFrame {
     private void clearForm() {
         txtStaffName.setText("");
         txtFatherName.setText("");
-        txtDesignation.setText("");
         txtMobile.setText("");
         txtAltMobile.setText("");
         txtAadhar.setText("");
