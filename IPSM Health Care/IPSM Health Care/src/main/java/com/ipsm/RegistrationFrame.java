@@ -359,10 +359,10 @@ public class RegistrationFrame extends JFrame {
         }
 
         private void showDoctorSelectionDialog() {
-                showDoctorSelectionDialog(null, false);
+                showDoctorSelectionDialog(null, false, txtReferDoctor);
         }
 
-        private void showDoctorSelectionDialog(String specialization, boolean useInternal) {
+        private void showDoctorSelectionDialog(String specialization, boolean useInternal, JTextField targetField) {
                 java.util.List<String> tempDoctors;
                 if (useInternal) {
                         tempDoctors = (specialization == null)
@@ -450,9 +450,9 @@ public class RegistrationFrame extends JFrame {
                 btnSelect.addActionListener(e -> {
                         String selected = doctorJList.getSelectedValue();
                         if (selected != null) {
-                                txtReferDoctor.setText(selected);
-                                if (txtSearchDoctor != null)
-                                        txtSearchDoctor.setText(selected);
+                                if (targetField != null) {
+                                        targetField.setText(selected);
+                                }
                                 // Update specialization context
                                 String spec = specialization != null ? specialization : "";
                                 if (spec.isEmpty()) {
@@ -1113,7 +1113,7 @@ public class RegistrationFrame extends JFrame {
                                         : rbDental.isSelected() ? "Dental"
                                                         : rbPhysiotherapy.isSelected() ? "Physiotherapy"
                                                                         : "Radiology";
-                        showDoctorSelectionDialog(spec, false);
+                        showDoctorSelectionDialog(spec, true, txtSearchDoctor);
                 });
                 doctorSearchPanel.add(btnDoctorSearch);
                 topBar.add(doctorSearchPanel, tbc);
@@ -1384,7 +1384,7 @@ public class RegistrationFrame extends JFrame {
                                                                 + "?",
                                                 "Doctor Selection", JOptionPane.YES_NO_OPTION);
                                 if (choice == JOptionPane.YES_OPTION) {
-                                        showDoctorSelectionDialog(spec, true);
+                                        showDoctorSelectionDialog(spec, true, txtSearchDoctor);
                                 }
                                 lastDoctorSpecialization = spec;
                         }
