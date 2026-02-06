@@ -50,8 +50,7 @@ CREATE TABLE IF NOT EXISTS registrations (
     balance_amount DECIMAL(10, 2),
     payment_mode VARCHAR(50),
     remarks TEXT,
-    FOREIGN KEY (patient_id) REFERENCES patients(patient_id),
-    FOREIGN KEY (doctor_id) REFERENCES doctors(doctor_id)
+    FOREIGN KEY (patient_id) REFERENCES patients(patient_id)
 );
 
 -- Table for Registration-Test Link

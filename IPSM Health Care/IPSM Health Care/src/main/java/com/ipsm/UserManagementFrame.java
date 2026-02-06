@@ -33,6 +33,7 @@ public class UserManagementFrame extends JFrame {
         setSize(1000, 650);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
+        Main.setAppIcon(this);
 
         // --- Top: Input Form ---
         JPanel topPanel = new JPanel(new BorderLayout());
@@ -444,7 +445,7 @@ public class UserManagementFrame extends JFrame {
                         }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    ErrorHandler.showError(UserManagementFrame.this, "Failed to fetch user details", e);
                 }
             }
         }.execute();
@@ -487,8 +488,7 @@ public class UserManagementFrame extends JFrame {
                         });
                     }
                 } catch (Exception ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(UserManagementFrame.this, "Failed to load users: " + ex.getMessage());
+                    ErrorHandler.showError(UserManagementFrame.this, "Failed to load users", ex);
                 }
             }
         }.execute();
@@ -518,7 +518,7 @@ public class UserManagementFrame extends JFrame {
             boolean success = com.ipsm.api.ApiClient.addUser(user);
             return success;
         } catch (Exception e) {
-            e.printStackTrace();
+            ErrorHandler.showError(this, "Network error while adding user", e);
             return false;
         }
     }
@@ -558,8 +558,7 @@ public class UserManagementFrame extends JFrame {
             boolean success = com.ipsm.api.ApiClient.updateUser(user);
             return success;
         } catch (Exception e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error updating user: " + e.getMessage());
+            ErrorHandler.showError(this, "Network error while updating user", e);
             return false;
         }
     }
@@ -573,7 +572,7 @@ public class UserManagementFrame extends JFrame {
             boolean success = com.ipsm.api.ApiClient.deleteUser(username);
             return success;
         } catch (Exception e) {
-            e.printStackTrace();
+            ErrorHandler.showError(this, "Network error while deleting user", e);
             return false;
         }
     }

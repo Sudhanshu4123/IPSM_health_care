@@ -15,6 +15,7 @@ public class DashboardFrame extends JFrame {
         setExtendedState(JFrame.MAXIMIZED_BOTH); // Full screen
         setMinimumSize(new Dimension(1100, 700));
         setLayout(new BorderLayout());
+        Main.setAppIcon(this);
         getContentPane().setBackground(new Color(240, 242, 245)); // Soft gray background
 
         // --- TOP BAR ---

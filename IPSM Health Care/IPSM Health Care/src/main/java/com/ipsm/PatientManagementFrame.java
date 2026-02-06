@@ -27,6 +27,7 @@ public class PatientManagementFrame extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
+        Main.setAppIcon(this);
 
         // --- Search Panel ---
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10));
@@ -191,7 +192,7 @@ public class PatientManagementFrame extends JFrame {
     private void handleAction() {
         int row = table.getSelectedRow();
         if (row == -1) {
-            JOptionPane.showMessageDialog(this, "Please select an entry.");
+            ErrorHandler.showWarning(this, "Please select an entry.");
             return;
         }
 
@@ -199,7 +200,7 @@ public class PatientManagementFrame extends JFrame {
             if (session.canTestStatus()) {
                 markAsDone(row);
             } else {
-                JOptionPane.showMessageDialog(this, "Permission Denied: You cannot update test status.");
+                ErrorHandler.showWarning(this, "Permission Denied: You cannot update test status.");
             }
         } else {
             reprintSelected(row);
@@ -209,7 +210,7 @@ public class PatientManagementFrame extends JFrame {
     private void markAsDone(int row) {
         String status = (String) tableModel.getValueAt(row, 7);
         if ("Done".equalsIgnoreCase(status)) {
-            JOptionPane.showMessageDialog(this, "Already marked as Done.");
+            ErrorHandler.showInfo(this, "Already marked as Done.");
             return;
         }
 
@@ -224,14 +225,13 @@ public class PatientManagementFrame extends JFrame {
                 int updated = pstmt.executeUpdate();
                 if (updated > 0) {
                     tableModel.setValueAt("Done", row, 7);
-                    JOptionPane.showMessageDialog(this, "Test updated to Done.");
+                    ErrorHandler.showInfo(this, "Test updated to Done.");
                 } else {
-                    JOptionPane.showMessageDialog(this, "Update failed.");
+                    ErrorHandler.showWarning(this, "Update failed.");
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+            ErrorHandler.showError(this, "Database error while updating test status", e);
         }
     }
 
@@ -290,7 +290,7 @@ public class PatientManagementFrame extends JFrame {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            ErrorHandler.showError(this, "Error during reprint", e);
         }
     }
 
@@ -430,8 +430,7 @@ public class PatientManagementFrame extends JFrame {
             lblCount.setText("Total: " + count);
 
         } catch (Exception e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error loading data: " + e.getMessage());
+            ErrorHandler.showError(this, "Error loading patient data", e);
         }
     }
 }

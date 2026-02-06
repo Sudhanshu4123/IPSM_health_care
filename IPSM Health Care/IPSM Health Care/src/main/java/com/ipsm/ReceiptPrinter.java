@@ -22,7 +22,7 @@ public class ReceiptPrinter implements Printable {
             try {
                 job.print();
             } catch (PrinterException ex) {
-                ex.printStackTrace();
+                ErrorHandler.showError(null, "Printing failed", ex);
             }
         }
     }
@@ -62,7 +62,7 @@ public class ReceiptPrinter implements Printable {
                 g2d.drawImage(logo, 5, y + 5, 45, 45, null);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Warning: Logo image loading failed: " + e.getMessage());
         }
 
         // Hospital Name
@@ -152,7 +152,7 @@ public class ReceiptPrinter implements Printable {
 
         g2d.drawLine(0, y, width, y);
         y += 15;
-        g2d.drawString("Amount to be Paid", 10, y);
+        g2d.drawString("Paid Amount", 10, y);
         g2d.drawString(data.netAmount + "/-", width - 110, y);
         y += 25;
 

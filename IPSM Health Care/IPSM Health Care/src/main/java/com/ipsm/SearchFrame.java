@@ -65,7 +65,7 @@ public class SearchFrame extends JFrame {
                 }
             }
         } catch (java.sql.SQLException e) {
-            e.printStackTrace();
+            ErrorHandler.showError(this, "Error searching database", e);
             sb.append("Error searching database: " + e.getMessage());
         }
         resultArea.setText(sb.toString());

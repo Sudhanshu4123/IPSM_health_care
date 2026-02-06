@@ -60,7 +60,7 @@ public class ApiClient {
                 }
             }
         } catch (Exception e) {
-            // Ignore
+            System.err.println("Failed to create default config.properties: " + e.getMessage());
         }
     }
 

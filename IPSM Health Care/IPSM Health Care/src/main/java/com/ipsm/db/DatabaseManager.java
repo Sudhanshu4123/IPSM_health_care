@@ -18,6 +18,8 @@ public class DatabaseManager {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
+            System.err.println(
+                    "CRITICAL: MySQL JDBC Driver not found. Please ensure mysql-connector-j is in the classpath.");
             e.printStackTrace();
         }
     }
@@ -112,7 +114,7 @@ public class DatabaseManager {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                System.err.println("Info: Could not check for 'users' table column version: " + e.getMessage());
             }
 
             // Migration logic and initial table creation...
@@ -136,6 +138,7 @@ public class DatabaseManager {
                     "mobile VARCHAR(15), " +
                     "email VARCHAR(100), " +
                     "address TEXT, " +
+                    "marital_status VARCHAR(20), " +
                     "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
 
             stmt.execute("CREATE TABLE IF NOT EXISTS registrations (" +
@@ -150,6 +153,19 @@ public class DatabaseManager {
                     "remarks TEXT, " +
                     "FOREIGN KEY (patient_id) REFERENCES patients(patient_id))");
 
+            // Migration: Drop old doctor_id foreign key if it exists to allow linking to
+            // 'users'
+            try {
+                stmt.execute("ALTER TABLE registrations DROP FOREIGN KEY registrations_ibfk_2");
+            } catch (SQLException e) {
+                // Ignore if not present
+            }
+            try {
+                // Secondary check for common named constraints
+                stmt.execute("ALTER TABLE registrations DROP FOREIGN KEY fk_doctor_id");
+            } catch (SQLException e) {
+            }
+
             stmt.execute("CREATE TABLE IF NOT EXISTS registration_tests (" +
                     "id INT AUTO_INCREMENT PRIMARY KEY, " +
                     "reg_id INT, " +
@@ -157,6 +173,13 @@ public class DatabaseManager {
                     "status VARCHAR(20) DEFAULT 'Pending', " +
                     "FOREIGN KEY (reg_id) REFERENCES registrations(reg_id), " +
                     "FOREIGN KEY (test_code) REFERENCES tests(test_code))");
+
+            stmt.execute("CREATE TABLE IF NOT EXISTS doctors (" +
+                    "doctor_id INT AUTO_INCREMENT PRIMARY KEY, " +
+                    "doctor_name VARCHAR(255) NOT NULL, " +
+                    "mobile VARCHAR(15), " +
+                    "address TEXT, " +
+                    "specialization VARCHAR(100))");
 
             stmt.execute("CREATE TABLE IF NOT EXISTS users (" +
                     "user_id INT AUTO_INCREMENT PRIMARY KEY, " +
@@ -222,10 +245,23 @@ public class DatabaseManager {
             try {
                 stmt.execute("ALTER TABLE users ADD COLUMN test_status BOOLEAN DEFAULT FALSE");
             } catch (SQLException e) {
+                // Already exists or other non-critical error
+            }
+
+            try {
+                stmt.execute("ALTER TABLE doctors ADD COLUMN specialization VARCHAR(100)");
+            } catch (SQLException e) {
+            }
+
+            try {
+                stmt.execute("ALTER TABLE patients ADD COLUMN marital_status VARCHAR(20)");
+            } catch (SQLException e) {
             }
 
         } catch (SQLException e) {
+            System.err.println("CRITICAL: Database initialization failed: " + e.getMessage());
             e.printStackTrace();
+            // Re-throw or handle as critical
         }
     }
 
@@ -277,6 +313,7 @@ public class DatabaseManager {
                 }
             }
         } catch (SQLException e) {
+            System.err.println("Error fetching tests: " + e.getMessage());
             e.printStackTrace();
         }
         return tests;
@@ -339,6 +376,7 @@ public class DatabaseManager {
                 }
             }
         } catch (SQLException e) {
+            System.err.println("Error getting next patient ID: " + e.getMessage());
             e.printStackTrace();
         }
         return nextId;
@@ -358,7 +396,8 @@ public class DatabaseManager {
                         results.add(new Object[] {
                                 rs.getInt("patient_id"), rs.getString("title"), rs.getString("patient_name"),
                                 rs.getString("gender"), rs.getInt("age"), rs.getString("age_unit"),
-                                rs.getString("mobile"), rs.getString("email"), rs.getString("address")
+                                rs.getString("mobile"), rs.getString("email"), rs.getString("address"),
+                                rs.getString("marital_status")
                         });
                     }
                 }
@@ -389,7 +428,8 @@ public class DatabaseManager {
                         results.add(new Object[] {
                                 rs.getInt("patient_id"), rs.getString("title"), rs.getString("patient_name"),
                                 rs.getString("gender"), rs.getInt("age"), rs.getString("age_unit"),
-                                rs.getString("mobile"), rs.getString("email"), rs.getString("address")
+                                rs.getString("mobile"), rs.getString("email"), rs.getString("address"),
+                                rs.getString("marital_status")
                         });
                     }
                 }
@@ -410,6 +450,95 @@ public class DatabaseManager {
                     doctors.add(rs.getString("doctor_name"));
             }
         } catch (SQLException e) {
+            System.err.println("Error fetching doctors: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return doctors;
+    }
+
+    public static Integer getDoctorIdByName(String name) {
+        if (name == null || name.isEmpty())
+            return null;
+        try (Connection conn = getConnection()) {
+            String sql = "SELECT doctor_id FROM doctors WHERE doctor_name = ?";
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, name);
+                try (ResultSet rs = pstmt.executeQuery()) {
+                    if (rs.next())
+                        return rs.getInt("doctor_id");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static List<String> getInternalDoctorsList() {
+        List<String> doctors = new ArrayList<>();
+        try (Connection conn = getConnection()) {
+            String sql = "SELECT username FROM users WHERE role = 'DOCTOR' ORDER BY username ASC";
+            try (Statement stmt = conn.createStatement();
+                    ResultSet rs = stmt.executeQuery(sql)) {
+                while (rs.next())
+                    doctors.add(rs.getString("username"));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching internal doctors: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return doctors;
+    }
+
+    public static Integer getInternalDoctorIdByName(String name) {
+        if (name == null || name.isEmpty())
+            return null;
+        try (Connection conn = getConnection()) {
+            String sql = "SELECT user_id FROM users WHERE username = ? AND role = 'DOCTOR'";
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, name);
+                try (ResultSet rs = pstmt.executeQuery()) {
+                    if (rs.next())
+                        return rs.getInt("user_id");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static List<String> getInternalDoctorsByDepartment(String dept) {
+        List<String> doctors = new ArrayList<>();
+        try (Connection conn = getConnection()) {
+            String sql = "SELECT username FROM users WHERE role = 'DOCTOR' AND department = ? ORDER BY username ASC";
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, dept);
+                try (ResultSet rs = pstmt.executeQuery()) {
+                    while (rs.next())
+                        doctors.add(rs.getString("username"));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching internal doctors by dept: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return doctors;
+    }
+
+    public static List<String> getDoctorsBySpecialization(String spec) {
+        List<String> doctors = new ArrayList<>();
+        try (Connection conn = getConnection()) {
+            String sql = "SELECT doctor_name FROM doctors WHERE specialization = ? ORDER BY doctor_name ASC";
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, spec);
+                try (ResultSet rs = pstmt.executeQuery()) {
+                    while (rs.next())
+                        doctors.add(rs.getString("doctor_name"));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching doctors by spec: " + e.getMessage());
             e.printStackTrace();
         }
         return doctors;

@@ -224,8 +224,7 @@ public class InvoiceFrame extends JFrame {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error during search: " + e.getMessage());
+            ErrorHandler.showError(this, "Error during invoice search", e);
         }
     }
 

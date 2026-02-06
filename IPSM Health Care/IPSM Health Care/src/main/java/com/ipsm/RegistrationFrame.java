@@ -1,6 +1,7 @@
 package com.ipsm;
 
 import javax.swing.*;
+import javax.swing.event.*;
 import javax.swing.border.TitledBorder;
 import com.ipsm.db.DatabaseManager;
 import javax.swing.table.DefaultTableModel;
@@ -12,7 +13,6 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Scanner;
 import javax.swing.text.*;
 
@@ -23,7 +23,7 @@ public class RegistrationFrame extends JFrame {
         private DefaultTableModel searchTableModel;
         private JTable searchTable;
         private JTextField searchField;
-        private List<TestData> allTests = new ArrayList<>();
+        private java.util.List<TestData> allTests = new ArrayList<>();
         private JTextField txtTotal;
         private JLabel lblBalAmtValue;
 
@@ -42,6 +42,10 @@ public class RegistrationFrame extends JFrame {
         private JTextField txtAddress;
         private JComboBox<String> comboSource;
         private JTextField txtReferDoctor;
+        private JComboBox<String> comboMaritalStatus;
+        private JTextField txtSearchDoctor;
+        private String lastDoctorSpecialization = "";
+        private JRadioButton rbPathology, rbDental, rbPhysiotherapy, rbXRay;
 
         // Payment Fields
         private JTextField txtRemarks;
@@ -111,10 +115,8 @@ public class RegistrationFrame extends JFrame {
                                         });
                                 }
                         } catch (Exception e) {
-                                e.printStackTrace();
                                 SwingUtilities.invokeLater(() -> {
-                                        JOptionPane.showMessageDialog(null,
-                                                        "Server Connection Issue: " + e.getMessage());
+                                        ErrorHandler.showError(RegistrationFrame.this, "Server Connection Issue", e);
                                 });
                         }
                 }).start();
@@ -125,12 +127,12 @@ public class RegistrationFrame extends JFrame {
         }
 
         public RegistrationFrame() {
-                populateTestData();
                 setTitle("New Registration - IPSM Health Care");
                 setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 setExtendedState(JFrame.MAXIMIZED_BOTH);
                 setMinimumSize(new Dimension(1200, 800));
                 setLayout(new BorderLayout());
+                Main.setAppIcon(this);
 
                 // --- TOP BLUE HEADER ---
                 JPanel topHeader = new JPanel(new BorderLayout());
@@ -171,6 +173,8 @@ public class RegistrationFrame extends JFrame {
 
                 add(new JScrollPane(mainContent), BorderLayout.CENTER);
 
+                populateTestData();
+
                 // --- BOTTOM ACTION BAR ---
                 JPanel actionBar = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 10));
                 actionBar.setBackground(new Color(245, 245, 245));
@@ -203,10 +207,10 @@ public class RegistrationFrame extends JFrame {
                         conn.setAutoCommit(false);
 
                         // 1. Insert/Update Patient
-                        String pSql = "INSERT INTO patients (patient_id, title, patient_name, gender, age, age_unit, mobile, email, address) "
+                        String pSql = "INSERT INTO patients (patient_id, title, patient_name, gender, age, age_unit, mobile, email, address, marital_status) "
                                         +
-                                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) " +
-                                        "ON DUPLICATE KEY UPDATE title=?, patient_name=?, gender=?, age=?, age_unit=?, mobile=?, email=?, address=?";
+                                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+                                        "ON DUPLICATE KEY UPDATE title=?, patient_name=?, gender=?, age=?, age_unit=?, mobile=?, email=?, address=?, marital_status=?";
                         String regText = txtRegNo.getText();
                         long patientId = Long.parseLong(
                                         regText.contains("/") ? regText.substring(regText.lastIndexOf("/") + 1)
@@ -221,16 +225,18 @@ public class RegistrationFrame extends JFrame {
                                 pstmt.setString(7, mobile);
                                 pstmt.setString(8, txtEmail.getText());
                                 pstmt.setString(9, txtAddress.getText());
+                                pstmt.setString(10, (String) comboMaritalStatus.getSelectedItem());
 
                                 // For Update
-                                pstmt.setString(10, title);
-                                pstmt.setString(11, name);
-                                pstmt.setString(12, gender);
-                                pstmt.setInt(13, ageStr.isEmpty() ? 0 : Integer.parseInt(ageStr));
-                                pstmt.setString(14, (String) comboAgeUnit.getSelectedItem());
-                                pstmt.setString(15, mobile);
-                                pstmt.setString(16, txtEmail.getText());
-                                pstmt.setString(17, txtAddress.getText());
+                                pstmt.setString(11, title);
+                                pstmt.setString(12, name);
+                                pstmt.setString(13, gender);
+                                pstmt.setInt(14, ageStr.isEmpty() ? 0 : Integer.parseInt(ageStr));
+                                pstmt.setString(15, (String) comboAgeUnit.getSelectedItem());
+                                pstmt.setString(16, mobile);
+                                pstmt.setString(17, txtEmail.getText());
+                                pstmt.setString(18, txtAddress.getText());
+                                pstmt.setString(19, (String) comboMaritalStatus.getSelectedItem());
 
                                 pstmt.executeUpdate();
                         }
@@ -252,6 +258,8 @@ public class RegistrationFrame extends JFrame {
                                         modes.append(mode);
                                         payDetails.append(mode).append(":").append(detail);
                                 } catch (Exception ex) {
+                                        System.err.println("Warning: Could not parse payment row " + i + ": "
+                                                        + ex.getMessage());
                                 }
                         }
 
@@ -260,7 +268,17 @@ public class RegistrationFrame extends JFrame {
                         try (java.sql.PreparedStatement pstmt = conn.prepareStatement(rSql,
                                         java.sql.Statement.RETURN_GENERATED_KEYS)) {
                                 pstmt.setLong(1, patientId);
-                                pstmt.setNull(2, java.sql.Types.INTEGER); // For now
+                                String docName = txtReferDoctor.getText().trim();
+                                Integer docId = DatabaseManager.getInternalDoctorIdByName(docName);
+                                if (docId == null) {
+                                        docId = DatabaseManager.getDoctorIdByName(docName);
+                                }
+
+                                if (docId != null) {
+                                        pstmt.setInt(2, docId);
+                                } else {
+                                        pstmt.setNull(2, java.sql.Types.INTEGER);
+                                }
                                 pstmt.setDouble(3, Double
                                                 .parseDouble(txtTotal.getText().isEmpty() ? "0" : txtTotal.getText()));
                                 pstmt.setDouble(4, totalPaidValue);
@@ -321,7 +339,7 @@ public class RegistrationFrame extends JFrame {
                         receiptData.total = Double.parseDouble(txtTotal.getText().isEmpty() ? "0" : txtTotal.getText());
                         receiptData.discount = Double
                                         .parseDouble(txtDiscAmount.getText().isEmpty() ? "0" : txtDiscAmount.getText());
-                        receiptData.netAmount = receiptData.total - receiptData.discount;
+                        receiptData.netAmount = totalPaidValue;
                         receiptData.paymentMode = modes.toString().isEmpty() ? "Cash" : modes.toString();
 
                         JOptionPane.showMessageDialog(this, "Registration Saved Successfully!");
@@ -330,26 +348,48 @@ public class RegistrationFrame extends JFrame {
                         try {
                                 new ReceiptPreviewDialog(this, receiptData).setVisible(true);
                         } catch (Exception ex) {
-                                ex.printStackTrace();
-                                JOptionPane.showMessageDialog(this, "Error showing preview: " + ex.getMessage());
+                                ErrorHandler.showError(this, "Error showing receipt preview", ex);
                         }
 
                         dispose();
 
                 } catch (Exception e) {
-                        e.printStackTrace();
-                        JOptionPane.showMessageDialog(this, "Error saving to database: " + e.getMessage());
+                        ErrorHandler.showError(this, "Error saving registration to database", e);
                 }
         }
 
         private void showDoctorSelectionDialog() {
-                java.util.List<String> doctorsList = DatabaseManager.getDoctorsList();
+                showDoctorSelectionDialog(null, false);
+        }
+
+        private void showDoctorSelectionDialog(String specialization, boolean useInternal) {
+                java.util.List<String> tempDoctors;
+                if (useInternal) {
+                        tempDoctors = (specialization == null)
+                                        ? DatabaseManager.getInternalDoctorsList()
+                                        : DatabaseManager.getInternalDoctorsByDepartment(specialization);
+                        if (tempDoctors.isEmpty() && specialization != null) {
+                                tempDoctors = DatabaseManager.getInternalDoctorsList();
+                        }
+                } else {
+                        tempDoctors = (specialization == null)
+                                        ? DatabaseManager.getDoctorsList()
+                                        : DatabaseManager.getDoctorsBySpecialization(specialization);
+                        if (tempDoctors.isEmpty() && specialization != null) {
+                                tempDoctors = DatabaseManager.getDoctorsList();
+                        }
+                }
+
+                final java.util.List<String> doctorsList = tempDoctors;
+
                 if (doctorsList.isEmpty()) {
-                        JOptionPane.showMessageDialog(this, "No doctors found in database. Please add one.");
+                        ErrorHandler.showWarning(this, "No doctors found in database. Please add one.");
                         return;
                 }
 
-                JDialog dialog = new JDialog(this, "Select Referring Doctor", true);
+                JDialog dialog = new JDialog(this,
+                                "Select Referring Doctor" + (specialization != null ? " (" + specialization + ")" : ""),
+                                true);
                 dialog.setLayout(new BorderLayout(10, 10));
                 dialog.setSize(400, 500);
                 dialog.setLocationRelativeTo(this);
@@ -411,9 +451,25 @@ public class RegistrationFrame extends JFrame {
                         String selected = doctorJList.getSelectedValue();
                         if (selected != null) {
                                 txtReferDoctor.setText(selected);
+                                if (txtSearchDoctor != null)
+                                        txtSearchDoctor.setText(selected);
+                                // Update specialization context
+                                String spec = specialization != null ? specialization : "";
+                                if (spec.isEmpty()) {
+                                        // Try to guess from radio buttons if spec was null (manual click)
+                                        if (rbPathology.isSelected())
+                                                spec = "Pathology";
+                                        else if (rbDental.isSelected())
+                                                spec = "Dental";
+                                        else if (rbPhysiotherapy.isSelected())
+                                                spec = "Physiotherapy";
+                                        else
+                                                spec = "Radiologist";
+                                }
+                                lastDoctorSpecialization = spec;
                                 dialog.dispose();
                         } else {
-                                JOptionPane.showMessageDialog(dialog, "Please select a doctor.");
+                                ErrorHandler.showWarning(dialog, "Please select a doctor.");
                         }
                 });
 
@@ -421,11 +477,13 @@ public class RegistrationFrame extends JFrame {
 
                 // Double click selection
                 doctorJList.addMouseListener(new MouseAdapter() {
+
                         public void mouseClicked(MouseEvent e) {
                                 if (e.getClickCount() == 2) {
                                         btnSelect.doClick();
                                 }
                         }
+
                 });
 
                 dialog.setVisible(true);
@@ -531,6 +589,7 @@ public class RegistrationFrame extends JFrame {
                                                 txtMobile.setText((String) pData[6]);
                                                 txtEmail.setText((String) pData[7]);
                                                 txtAddress.setText((String) pData[8]);
+                                                comboMaritalStatus.setSelectedItem(pData[9]);
                                                 break;
                                         }
                                 }
@@ -561,7 +620,7 @@ public class RegistrationFrame extends JFrame {
 
                 JPanel pNamePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 0));
                 pNamePanel.setOpaque(false);
-                comboTitle = new JComboBox<>(new String[] { "Mr.", "Mrs.", "Ms.", "baby" });
+                comboTitle = new JComboBox<>(new String[] { "Mr.", "Mrs.", "Ms.", "baby", "master" });
                 pNamePanel.add(comboTitle);
                 txtPatientName = new JTextField(15);
                 pNamePanel.add(txtPatientName);
@@ -605,11 +664,26 @@ public class RegistrationFrame extends JFrame {
                 txtAge = new JTextField(5);
                 comboAgeUnit = new JComboBox<>(new String[] { "YRS", "MONTHS", "DAYS" });
                 comboGender = new JComboBox<>(new String[] { "Male", "Female", "Other" });
+                comboMaritalStatus = new JComboBox<>(new String[] { "Single", "Married" });
                 ageFieldPanel.add(txtAge);
                 ageFieldPanel.add(comboAgeUnit);
                 ageFieldPanel.add(comboGender);
+                ageFieldPanel.add(new JLabel("  Marital:"));
+                ageFieldPanel.add(comboMaritalStatus);
                 gbc.gridx = 1;
                 p.add(ageFieldPanel, gbc);
+
+                // Auto Title Update Logic
+                ActionListener autoTitleListener = e -> updateTitleAuto();
+                comboGender.addActionListener(autoTitleListener);
+                comboAgeUnit.addActionListener(autoTitleListener);
+                comboMaritalStatus.addActionListener(autoTitleListener);
+                txtAge.addFocusListener(new FocusAdapter() {
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                                updateTitleAuto();
+                        }
+                });
 
                 gbc.gridx = 2;
                 p.add(createLabel("Mobile No :", true), gbc);
@@ -885,6 +959,45 @@ public class RegistrationFrame extends JFrame {
                 return p;
         }
 
+        private void updateTitleAuto() {
+                String ageStr = txtAge.getText().trim();
+                String gender = (String) comboGender.getSelectedItem();
+                String ageUnit = (String) comboAgeUnit.getSelectedItem();
+                String marital = (String) comboMaritalStatus.getSelectedItem();
+
+                if (ageStr.isEmpty())
+                        return;
+
+                try {
+                        int age = Integer.parseInt(ageStr);
+                        boolean isChild = false;
+                        if ("YRS".equals(ageUnit) && age < 12) {
+                                isChild = true;
+                        } else if ("MONTHS".equals(ageUnit) || "DAYS".equals(ageUnit)) {
+                                isChild = true;
+                        }
+
+                        if (isChild) {
+                                if ("Female".equals(gender)) {
+                                        comboTitle.setSelectedItem("baby");
+                                } else if ("Male".equals(gender)) {
+                                        comboTitle.setSelectedItem("master");
+                                }
+                        } else {
+                                if ("Male".equals(gender)) {
+                                        comboTitle.setSelectedItem("Mr.");
+                                } else if ("Female".equals(gender)) {
+                                        if ("Married".equals(marital)) {
+                                                comboTitle.setSelectedItem("Mrs.");
+                                        } else {
+                                                comboTitle.setSelectedItem("Ms.");
+                                        }
+                                }
+                        }
+                } catch (NumberFormatException e) {
+                }
+        }
+
         private JPanel createInvestigationPanel() {
                 JPanel p = new JPanel(new BorderLayout());
                 p.setBackground(new Color(230, 245, 255));
@@ -902,10 +1015,10 @@ public class RegistrationFrame extends JFrame {
                 tbc.anchor = GridBagConstraints.WEST;
                 tbc.weightx = 1.0;
 
-                JRadioButton rbPathology = new JRadioButton("Pathology", true);
-                JRadioButton rbDental = new JRadioButton("Dental");
-                JRadioButton rbPhysiotherapy = new JRadioButton("Physiotherapy");
-                JRadioButton rbXRay = new JRadioButton("Radiology");
+                rbPathology = new JRadioButton("Pathology", true);
+                rbDental = new JRadioButton("Dental");
+                rbPhysiotherapy = new JRadioButton("Physiotherapy");
+                rbXRay = new JRadioButton("Radiology");
 
                 ButtonGroup mainCategoryGroup = new ButtonGroup();
                 mainCategoryGroup.add(rbPathology);
@@ -985,6 +1098,25 @@ public class RegistrationFrame extends JFrame {
                 searchPanel.add(btnDeleteTest);
 
                 topBar.add(searchPanel, tbc);
+
+                tbc.gridy = 2;
+                JPanel doctorSearchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+                doctorSearchPanel.setOpaque(false);
+                doctorSearchPanel.add(new JLabel("Search Doctor:"));
+                txtSearchDoctor = new JTextField(30);
+                txtSearchDoctor.setEditable(false);
+                txtSearchDoctor.setBackground(Color.WHITE);
+                doctorSearchPanel.add(txtSearchDoctor);
+                JButton btnDoctorSearch = new JButton("Select Doctor");
+                btnDoctorSearch.addActionListener(e -> {
+                        String spec = rbPathology.isSelected() ? "Pathology"
+                                        : rbDental.isSelected() ? "Dental"
+                                                        : rbPhysiotherapy.isSelected() ? "Physiotherapy"
+                                                                        : "Radiology";
+                        showDoctorSelectionDialog(spec, false);
+                });
+                doctorSearchPanel.add(btnDoctorSearch);
+                topBar.add(doctorSearchPanel, tbc);
                 p.add(topBar, BorderLayout.NORTH);
 
                 // --- Center Panel: Search Table | Main Table ---
@@ -1030,11 +1162,21 @@ public class RegistrationFrame extends JFrame {
                         refreshSearchTable("X-Ray");
                 });
 
-                subXRay.addActionListener(e -> refreshSearchTable("X-Ray"));
-                subCT.addActionListener(e -> refreshSearchTable("CT Scan"));
-                subMRI.addActionListener(e -> refreshSearchTable("MRI"));
-                subUSG.addActionListener(e -> refreshSearchTable("Ultrasound"));
-                subECG.addActionListener(e -> refreshSearchTable("ECG"));
+                subXRay.addActionListener(e -> {
+                        refreshSearchTable("X-Ray");
+                });
+                subCT.addActionListener(e -> {
+                        refreshSearchTable("CT Scan");
+                });
+                subMRI.addActionListener(e -> {
+                        refreshSearchTable("MRI");
+                });
+                subUSG.addActionListener(e -> {
+                        refreshSearchTable("Ultrasound");
+                });
+                subECG.addActionListener(e -> {
+                        refreshSearchTable("ECG");
+                });
 
                 final TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(searchTableModel);
                 searchTable.setRowSorter(sorter);
@@ -1067,8 +1209,9 @@ public class RegistrationFrame extends JFrame {
                                 int modelRow = e.getFirstRow();
                                 boolean selected = (Boolean) searchTableModel.getValueAt(modelRow, 0);
                                 String code = (String) searchTableModel.getValueAt(modelRow, 1);
-                                TestData test = allTests.stream().filter(t -> t.code.equals(code)).findFirst()
-                                                .orElse(null);
+                                java.util.Optional<TestData> testDataOpt = allTests.stream()
+                                                .filter(t -> t.code.equals(code)).findFirst();
+                                TestData test = testDataOpt.orElse(null);
                                 if (test != null) {
                                         updateMainTableSelection(test, selected);
                                 }
@@ -1225,6 +1368,25 @@ public class RegistrationFrame extends JFrame {
                                                 "Duplicate Test", JOptionPane.YES_NO_OPTION);
                                 if (choice != JOptionPane.YES_OPTION)
                                         return;
+                        }
+
+                        // Check for doctor context
+                        String currentCategory = test.category;
+                        if (!currentCategory.equals(lastDoctorSpecialization) || txtReferDoctor.getText().isEmpty()) {
+                                String spec = currentCategory;
+                                if (currentCategory.contains("Scan") || currentCategory.contains("X-Ray")
+                                                || currentCategory.contains("Ultrasound")
+                                                || currentCategory.contains("MRI")) {
+                                        spec = "Radiology";
+                                }
+                                int choice = JOptionPane.showConfirmDialog(this,
+                                                "Would you like to select a referring doctor for " + currentCategory
+                                                                + "?",
+                                                "Doctor Selection", JOptionPane.YES_NO_OPTION);
+                                if (choice == JOptionPane.YES_OPTION) {
+                                        showDoctorSelectionDialog(spec, true);
+                                }
+                                lastDoctorSpecialization = spec;
                         }
 
                         mainTableModel.addRow(new Object[] {
@@ -1588,7 +1750,9 @@ public class RegistrationFrame extends JFrame {
                                 JOptionPane.showMessageDialog(dialog, "Test added successfully!");
                                 dialog.dispose();
                         } catch (NumberFormatException ex) {
-                                JOptionPane.showMessageDialog(dialog, "Invalid price or MRP.");
+                                ErrorHandler.showWarning(dialog, "Invalid price or MRP. Please enter numeric values.");
+                        } catch (Exception ex) {
+                                ErrorHandler.showError(dialog, "Error saving test", ex);
                         }
                 });
 
@@ -1610,10 +1774,10 @@ public class RegistrationFrame extends JFrame {
                 int modelRow = searchTable.convertRowIndexToModel(row);
                 String code = (String) searchTableModel.getValueAt(modelRow, 1);
 
-                TestData testToDelete = allTests.stream()
+                java.util.Optional<TestData> testToDeleteOpt = allTests.stream()
                                 .filter(t -> t.code.equals(code))
-                                .findFirst()
-                                .orElse(null);
+                                .findFirst();
+                TestData testToDelete = testToDeleteOpt.orElse(null);
 
                 if (testToDelete == null)
                         return;
@@ -1632,7 +1796,7 @@ public class RegistrationFrame extends JFrame {
                         allTests.remove(testToDelete);
                         rewriteCustomTestsFile();
                         refreshSearchTable(testToDelete.category);
-                        JOptionPane.showMessageDialog(this, "Test deleted successfully!");
+                        ErrorHandler.showInfo(this, "Test deleted successfully!");
                 }
         }
 
@@ -1648,7 +1812,7 @@ public class RegistrationFrame extends JFrame {
                                 }
                         }
                 } catch (IOException e) {
-                        e.printStackTrace();
+                        ErrorHandler.showError(this, "Error saving local test file", e);
                 }
         }
 }

@@ -12,6 +12,7 @@ public class DoctorRegistrationFrame extends JFrame {
     private JTextField txtPhone;
     private JTextField txtClinicName;
     private JTextArea txtAddress;
+    private JComboBox<String> comboSpecialization;
 
     public DoctorRegistrationFrame() {
         setTitle("Referring Doctor Registration");
@@ -19,6 +20,7 @@ public class DoctorRegistrationFrame extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
+        Main.setAppIcon(this);
         getContentPane().setBackground(new Color(210, 235, 255));
 
         // --- TITLE BAR ---
@@ -74,13 +76,11 @@ public class DoctorRegistrationFrame extends JFrame {
         detailsPanel.add(txtPhone, gbc);
 
         gbc.gridx = 2;
-        detailsPanel.add(createLabel("Decided Percentage :", false), gbc);
+        detailsPanel.add(createLabel("Specialization :", false), gbc);
         gbc.gridx = 3;
-        detailsPanel.add(new JTextField(15), gbc);
-        // detailsPanel.add(createLabel("Specialization :", false), gbc);
-        // gbc.gridx = 3;
-        // detailsPanel.add(new JComboBox<>(new String[] { "-", "Cardiology",
-        // "Dermatology", "Gastroenterology" }), gbc);
+        comboSpecialization = new JComboBox<>(
+                new String[] { "Pathology", "Dental", "Physiotherapy", "Radiologist", "Radiology Phar" });
+        detailsPanel.add(comboSpecialization, gbc);
 
         // --- ROW 2: Clinic Name (L) | Clinic Address (R) ---
         gbc.gridx = 0;
@@ -227,24 +227,24 @@ public class DoctorRegistrationFrame extends JFrame {
         String address = txtAddress.getText().trim();
 
         if (name.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter doctor name");
+            ErrorHandler.showWarning(this, "Please enter doctor name");
             return;
         }
 
         try (java.sql.Connection conn = DatabaseManager.getConnection()) {
-            String sql = "INSERT INTO doctors (doctor_name, mobile, address) VALUES (?, ?, ?)";
+            String sql = "INSERT INTO doctors (doctor_name, mobile, address, specialization) VALUES (?, ?, ?, ?)";
             try (java.sql.PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 pstmt.setString(1, title + " " + name);
                 pstmt.setString(2, phone);
                 pstmt.setString(3, (clinic.isEmpty() ? "" : clinic + ", ") + address);
+                pstmt.setString(4, (String) comboSpecialization.getSelectedItem());
                 pstmt.executeUpdate();
 
-                JOptionPane.showMessageDialog(this, "Doctor Registered Successfully!");
+                ErrorHandler.showInfo(this, "Doctor Registered Successfully!");
                 dispose();
             }
         } catch (java.sql.SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error saving doctor: " + e.getMessage());
+            ErrorHandler.showError(this, "Error saving doctor", e);
         }
     }
 

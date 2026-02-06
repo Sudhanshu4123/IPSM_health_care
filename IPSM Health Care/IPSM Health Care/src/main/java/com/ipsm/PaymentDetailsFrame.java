@@ -106,8 +106,7 @@ public class PaymentDetailsFrame extends JFrame {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error loading payments: " + e.getMessage());
+            ErrorHandler.showError(this, "Error loading payments", e);
         }
 
         lblTotalCollected.setText("Total Collected: Rs. " + String.format("%.2f", grandTotalCollected));

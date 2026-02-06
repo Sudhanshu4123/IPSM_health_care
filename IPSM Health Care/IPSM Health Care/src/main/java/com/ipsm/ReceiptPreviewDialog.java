@@ -59,7 +59,7 @@ public class ReceiptPreviewDialog extends JDialog {
                 try {
                     printer.print(g2d, pf, 0);
                 } catch (PrinterException e) {
-                    e.printStackTrace();
+                    System.err.println("Preview drawing error: " + e.getMessage());
                 }
             }
         };

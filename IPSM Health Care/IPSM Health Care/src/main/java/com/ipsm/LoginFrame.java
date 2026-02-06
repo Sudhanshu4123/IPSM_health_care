@@ -20,6 +20,7 @@ public class LoginFrame extends JFrame {
         setSize(400, 550);
         setLocationRelativeTo(null);
         setResizable(false);
+        Main.setAppIcon(this);
 
         // Main Panel
         JPanel mainPanel = new JPanel();
@@ -185,8 +186,7 @@ public class LoginFrame extends JFrame {
                             JOptionPane.showMessageDialog(dialog, "Invalid Username or Old Password.");
                         }
                     } catch (Exception ex) {
-                        ex.printStackTrace();
-                        JOptionPane.showMessageDialog(dialog, "Error connecting to server: " + ex.getMessage());
+                        ErrorHandler.showError(dialog, "Error connecting to server", ex);
                     }
                 });
 
@@ -251,7 +251,7 @@ public class LoginFrame extends JFrame {
                 } catch (Exception e) {
                     // Extract execution exception cause if present
                     Throwable cause = e.getCause() != null ? e.getCause() : e;
-                    cause.printStackTrace();
+                    ErrorHandler.showError(LoginFrame.this, "Login Connection Error", (Exception) cause);
 
                     String msg = cause.getMessage();
 
@@ -262,7 +262,8 @@ public class LoginFrame extends JFrame {
                     } else if (cause instanceof java.net.ConnectException ||
                             msg != null && msg.contains("Connection refused")) {
                         messageLabel.setText("Server unreachable. Check internet/server status.");
-                    } else if (msg != null && msg.contains("401")) { // Unauthorized
+                    } else if (msg != null && (msg.contains("401") || msg.contains("405"))) { // Unauthorized or
+                                                                                              // redirected error
                         messageLabel.setText("Invalid Username or Password");
                     } else if (msg != null && (msg.contains("timeout") || msg.contains("Timed out"))) {
                         messageLabel.setText("Connection timed out. Check your internet.");
