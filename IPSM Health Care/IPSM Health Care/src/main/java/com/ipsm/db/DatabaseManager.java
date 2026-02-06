@@ -249,6 +249,11 @@ public class DatabaseManager {
             }
 
             try {
+                stmt.execute("ALTER TABLE users ADD COLUMN staff_id VARCHAR(50)");
+            } catch (SQLException e) {
+            }
+
+            try {
                 stmt.execute("ALTER TABLE doctors ADD COLUMN specialization VARCHAR(100)");
             } catch (SQLException e) {
             }
@@ -760,5 +765,20 @@ public class DatabaseManager {
             e.printStackTrace();
         }
         return staffList;
+    }
+
+    public static List<Object[]> getStaffDataForUserManagement() {
+        List<Object[]> data = new java.util.ArrayList<>();
+        try (Connection conn = getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt
+                        .executeQuery("SELECT staff_id, staff_name, branch FROM staff ORDER BY staff_name")) {
+            while (rs.next()) {
+                data.add(new Object[] { rs.getString(1), rs.getString(2), rs.getString(3) });
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return data;
     }
 }

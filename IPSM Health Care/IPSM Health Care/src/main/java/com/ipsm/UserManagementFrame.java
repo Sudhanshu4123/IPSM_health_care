@@ -13,7 +13,8 @@ public class UserManagementFrame extends JFrame {
     // Form fields
     private JTextField txtUsername;
     private JPasswordField txtPassword;
-    private JComboBox<String> comboRole;
+    private JComboBox<String> comboRole, comboStaffId;
+    private java.util.Map<String, String> staffDeptMap = new java.util.HashMap<>();
     private JComboBox<String> cmbDepartment; // New Department Field
     private JButton btnAdd;
     private JButton btnUpdate;
@@ -74,9 +75,36 @@ public class UserManagementFrame extends JFrame {
         cmbDepartment = new JComboBox<>(new String[] { "None", "Dental", "Physiotherapy", "Pathology", "Radiology" });
         cmbDepartment.setEnabled(false); // Default disabled
 
-        // Row 1
+        // Row 0: Staff ID Selector
+        comboStaffId = new JComboBox<>();
+        comboStaffId.addItem("--- Select Staff ---");
+        loadStaffList();
+        comboStaffId.addActionListener(e -> {
+            String selected = (String) comboStaffId.getSelectedItem();
+            if (selected != null && !"--- Select Staff ---".equals(selected)) {
+                String id = selected.split(" - ")[0];
+                String dept = staffDeptMap.get(id);
+                if (dept != null) {
+                    cmbDepartment.setSelectedItem(dept);
+                }
+                // Auto-fill username if empty
+                if (txtUsername.getText().trim().isEmpty()) {
+                    txtUsername.setText(selected.split(" - ")[1].toLowerCase().replace(" ", "."));
+                }
+            }
+        });
+
         gbc.gridx = 0;
         gbc.gridy = 0;
+        userDetailsPanel.add(new JLabel("Link Staff:"), gbc);
+        gbc.gridx = 1;
+        gbc.gridwidth = 3;
+        userDetailsPanel.add(comboStaffId, gbc);
+        gbc.gridwidth = 1;
+
+        // Row 1
+        gbc.gridx = 0;
+        gbc.gridy = 1;
         userDetailsPanel.add(new JLabel("Username:"), gbc);
         gbc.gridx = 1;
         userDetailsPanel.add(txtUsername, gbc);
@@ -88,7 +116,7 @@ public class UserManagementFrame extends JFrame {
 
         // Row 2
         gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridy = 2;
         userDetailsPanel.add(new JLabel("Role:"), gbc);
         gbc.gridx = 1;
         userDetailsPanel.add(comboRole, gbc);
@@ -282,6 +310,15 @@ public class UserManagementFrame extends JFrame {
         loadUsers();
     }
 
+    private void loadStaffList() {
+        java.util.List<Object[]> staff = com.ipsm.db.DatabaseManager.getStaffDataForUserManagement();
+        for (Object[] s : staff) {
+            String entry = s[0] + " - " + s[1];
+            comboStaffId.addItem(entry);
+            staffDeptMap.put((String) s[0], (String) s[2]);
+        }
+    }
+
     private void applyRolePresets() {
         String role = (String) comboRole.getSelectedItem();
 
@@ -350,6 +387,7 @@ public class UserManagementFrame extends JFrame {
         btnAdd.setEnabled(true);
         btnUpdate.setEnabled(false);
         txtUsername.setEditable(true);
+        comboStaffId.setSelectedIndex(0);
     }
 
     private void loadUserToForm(int row) {
@@ -441,6 +479,16 @@ public class UserManagementFrame extends JFrame {
                             chkRepLedger.setSelected(u.isRepLedger());
                             chkRepBusiness.setSelected(u.isRepBusiness());
                             chkRepSales.setSelected(u.isRepSales());
+                            if (u.getStaffId() != null) {
+                                for (int i = 0; i < comboStaffId.getItemCount(); i++) {
+                                    if (comboStaffId.getItemAt(i).startsWith(u.getStaffId() + " - ")) {
+                                        comboStaffId.setSelectedIndex(i);
+                                        break;
+                                    }
+                                }
+                            } else {
+                                comboStaffId.setSelectedIndex(0);
+                            }
                             break;
                         }
                     }
@@ -502,6 +550,11 @@ public class UserManagementFrame extends JFrame {
         String dept = (String) cmbDepartment.getSelectedItem();
         user.setDepartment("None".equals(dept) ? null : dept);
 
+        String selStaff = (String) comboStaffId.getSelectedItem();
+        if (selStaff != null && !"--- Select Staff ---".equals(selStaff)) {
+            user.setStaffId(selStaff.split(" - ")[0]);
+        }
+
         user.setRegNew(chkRegNew.isSelected());
         user.setRegEdit(chkRegEdit.isSelected());
         user.setRegManage(chkRegManage.isSelected());
@@ -541,6 +594,11 @@ public class UserManagementFrame extends JFrame {
         user.setRole((String) comboRole.getSelectedItem());
         String dept = (String) cmbDepartment.getSelectedItem();
         user.setDepartment("None".equals(dept) ? null : dept);
+
+        String selStaff = (String) comboStaffId.getSelectedItem();
+        if (selStaff != null && !"--- Select Staff ---".equals(selStaff)) {
+            user.setStaffId(selStaff.split(" - ")[0]);
+        }
 
         user.setRegNew(chkRegNew.isSelected());
         user.setRegEdit(chkRegEdit.isSelected());

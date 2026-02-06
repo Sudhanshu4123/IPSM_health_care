@@ -9,6 +9,7 @@ public class User {
     private String password;
     private String role;
     private String department;
+    private String staffId;
 
     private boolean regNew;
     private boolean regEdit;
@@ -174,5 +175,13 @@ public class User {
 
     public void setTestStatus(boolean testStatus) {
         this.testStatus = testStatus;
+    }
+
+    public String getStaffId() {
+        return staffId;
+    }
+
+    public void setStaffId(String staffId) {
+        this.staffId = staffId;
     }
 }
