@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Report | HealthCare</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .coming-soon-container {
+            height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-top: 20px;
+        }
+
+        .coming-soon-icon {
+            font-size: 5rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-20px);
+            }
+
+            60% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .coming-soon-container h1 {
+            font-size: 2.5rem;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        .coming-soon-container p {
+            color: #64748b;
+            font-size: 1.2rem;
+            max-width: 500px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="top-bar">
+        <div class="user-info-top">
+            <span>Center: <strong>Main Healthcare Center</strong></span>
+            <span>| Role: <strong>ADMIN</strong></span>
+        </div>
+        <div>
+            <span id="live-time" style="margin-right: 15px;"></span>
+            <form action="/logout" method="POST" style="display:inline;"
+                onsubmit="return confirm('Are you sure you want to logout?');">
+                <button type="submit" class="logout-link"
+                    style="background:none; border:none; color:inherit; font-weight:600; cursor:pointer; padding:0; font-size: 0.85rem; color:#b91c1c;">Logout</button>
+            </form>
+        </div>
+    </div>
+
+    <nav>
+        <div class="logo">
+            <i class="fa-solid fa-stethoscope"></i>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Dashboard</a></li>
+            <li class="dropdown">
+                <a href="#">Registration <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem;"></i></a>
+                <ul class="dropdown-menu">
+                    <li><a href="registration.html">New Registration</a></li>
+                    <li><a href="manage-patients.html">Manage Patient</a></li>
+                </ul>
+            </li>
+            <li class="dropdown">
+                <a href="#">Reports <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem;"></i></a>
+                <ul class="dropdown-menu">
+                    <li><a href="#">Back Date Outstanding Report</a></li>
+                    <li><a href="#">Invoice Month Wise Summary Report</a></li>
+                    <li><a href="#">Ledger Transaction</a></li>
+                    <li><a href="#">Sales Business Report</a></li>
+                    <li><a href="#">Sales Report</a></li>
+                </ul>
+            </li>
+            <li><a href="patient-report.html" class="active">Patient Report</a></li>
+            <li><a href="billing.html">Billing</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="coming-soon-container">
+            <div class="coming-soon-icon">
+                <i class="fa-solid fa-hourglass-half"></i>
+            </div>
+            <h1>Coming Soon!</h1>
+            <p>We are working hard to bring you a comprehensive Patient Reporting system. Stay tuned for updates!</p>
+            <div style="margin-top: 30px;">
+                <a href="index.html" class="btn btn-primary">Back to Dashboard</a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Healthcare Management System. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        // Live Time
+        setInterval(() => {
+            const now = new Date();
+            const timeEl = document.getElementById('live-time');
+            if (timeEl) timeEl.textContent = now.toLocaleString();
+        }, 1000);
+    </script>
+</body>
+
+</html>

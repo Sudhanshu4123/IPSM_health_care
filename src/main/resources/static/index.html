@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Management System</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="user-info-top">
+            <span><i class="fa-solid fa-hospital"></i> <strong>Healthcare Management</strong></span>
+            <span>| Role: <strong>ADMIN</strong></span>
+        </div>
+        <div>
+            <span id="live-time"></span>
+            <form action="/logout" method="POST" style="display:inline; margin-left:15px;"
+                onsubmit="return confirm('Are you sure you want to logout?');">
+                <button type="submit" class="logout-link"
+                    style="background:none; border:none; color:inherit; font:inherit; cursor:pointer; padding:0;">Logout</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">
+            <i class="fa-solid fa-stethoscope"></i>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html" class="active">Dashboard</a></li>
+            <li class="dropdown">
+                <a href="#">Registration <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem;"></i></a>
+                <ul class="dropdown-menu">
+                    <li><a href="registration.html">New Registration</a></li>
+                    <li><a href="manage-patients.html">Manage Patient</a></li>
+                </ul>
+            </li>
+            <li class="dropdown">
+                <a href="#">Reports <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem;"></i></a>
+                <ul class="dropdown-menu">
+                    <li><a href="#">Back Date Outstanding Report</a></li>
+                    <li><a href="#">Invoice Month Wise Summary Report</a></li>
+                    <li><a href="#">Ledger Transaction</a></li>
+                    <li><a href="#">Sales Business Report</a></li>
+                    <li><a href="#">Sales Report</a></li>
+                </ul>
+            </li>
+            <li><a href="patient-report.html">Patient Report</a></li>
+            <li><a href="billing.html">Billing</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <!-- Welcome Section -->
+        <section class="welcome-section">
+            <h1 id="welcome-heading">Welcome, Admin</h1>
+            <p>Welcome to Healthcare Management Portal</p>
+            <div style="margin-top: 15px; display: flex; justify-content: center; gap: 10px; align-items: center;">
+                <label for="centre-select" style="font-weight: 600;">Switch Centre:</label>
+                <select id="centre-select" style="padding: 5px 10px; border-radius: 4px; border: 1px solid #ccc;">
+                    <option value="main">Main Centre</option>
+                    <option value="city">City Branch</option>
+                    <option value="north">North Wing</option>
+                </select>
+            </div>
+        </section>
+
+        <div class="dashboard-grid">
+            <!-- System Info Card -->
+            <div class="card">
+                <div class="card-title">
+                    <i class="fa-solid fa-user-gear"></i> Account Details
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Current User:</span>
+                    <span class="info-value">admin</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Access Role:</span>
+                    <span class="info-value">ADMINISTRATOR</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Last Activity:</span>
+                    <span class="info-value" id="last-login">--:--</span>
+                </div>
+                <div class="info-row" style="margin-top: 10px;">
+                    <span class="info-label">System Status:</span>
+                    <span class="info-value" style="color: var(--secondary-color);">Online</span>
+                </div>
+            </div>
+
+
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Healthcare Management System. All Rights Reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

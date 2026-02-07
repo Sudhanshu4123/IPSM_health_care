@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Billing | HealthCare</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@1,600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .billing-interface {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            min-height: 80vh;
+        }
+
+        /* Table Refinements */
+        .patient-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.9rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .patient-table th {
+            background: #f8fafc;
+            color: #475569;
+            font-weight: 700;
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 2px solid #e2e8f0;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .patient-table td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .patient-table tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .text-right {
+            text-align: right !important;
+        }
+
+        .billing-search {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            align-items: center;
+        }
+
+        .billing-search input {
+            flex-grow: 1;
+            height: 45px;
+            padding: 0 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        /* Invoice Design - Using User Provided Image */
+        .invoice-preview {
+            width: 210mm;
+            height: 297mm;
+            margin: 30px auto;
+            background-image: url('/image/receipt.jpeg');
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            position: relative;
+            background-color: white;
+            display: none;
+            /* Keep hidden on screen as per user request */
+        }
+
+        .overlay-data {
+            position: absolute;
+            font-family: 'Arial', sans-serif;
+            font-size: 14px;
+            color: #000;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        /* Exact coordinates matching the provided reference image */
+        .receipt-no {
+            top: 118px;
+            left: 20px;
+        }
+
+        .receipt-date {
+            top: 118px;
+            left: 260px;
+        }
+
+        .receipt-time {
+            top: 118px;
+            left: 550px;
+        }
+
+        .p-date {
+            top: 154px;
+            left: 20px;
+        }
+
+        .p-srl {
+            top: 154px;
+            left: 420px;
+        }
+
+        .p-id {
+            top: 154px;
+            left: 550px;
+        }
+
+        .p-name {
+            top: 185px;
+            left: 20px;
+        }
+
+        .p-age {
+            top: 185px;
+            left: 420px;
+        }
+
+        .p-sex {
+            top: 185px;
+            left: 550px;
+        }
+
+        .p-ref {
+            top: 220px;
+            left: 20px;
+            border-top: 2px solid #7b1f5e;
+            padding-top: 5px;
+            width: 95%;
+        }
+
+        /* Line above first data row */
+        .row-line-top {
+            position: absolute;
+            top: 110px;
+            left: 20px;
+            width: 95%;
+            border-top: 2px solid #7b1f5e;
+        }
+
+        .items-area {
+            position: absolute;
+            top: 260px;
+            left: 20px;
+            width: 95%;
+        }
+
+        .items-header {
+            display: flex;
+            border-top: 2px solid #7b1f5e;
+            border-bottom: 2px solid #7b1f5e;
+            padding: 8px 0;
+            font-weight: 800;
+            color: #000;
+            margin-bottom: 15px;
+        }
+
+        .item-row {
+            display: flex;
+            padding: 4px 0;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        /* Totals labels & values */
+        .summary-row {
+            position: absolute;
+            width: 95%;
+            display: flex;
+            justify-content: space-between;
+            left: 20px;
+        }
+
+        .total-row {
+            top: 428px;
+            border-top: 2px solid #7b1f5e;
+            padding-top: 8px;
+        }
+
+        .discount-row {
+            top: 460px;
+            border-bottom: 2px solid #7b1f5e;
+            padding-bottom: 8px;
+        }
+
+        .paid-row {
+            top: 500px;
+            font-size: 1.1rem;
+        }
+
+        .val-align {
+            font-weight: 700;
+            width: 120px;
+            text-align: right;
+        }
+
+        .thanks-note-overlay {
+            position: absolute;
+            top: 522px;
+            left: 20px;
+            width: 95%;
+            font-size: 14px;
+            line-height: 1.6;
+            font-weight: 600;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+
+            .invoice-preview,
+            .invoice-preview * {
+                visibility: visible;
+            }
+
+            .invoice-preview {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                display: block !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+
+        .print-btn-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--secondary-color);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            z-index: 2000;
+            font-size: 1.5rem;
+            border: none;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+
+            .invoice-preview,
+            .invoice-preview * {
+                visibility: visible;
+            }
+
+            .invoice-preview {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                border: none;
+                margin: 0;
+                box-shadow: none;
+                display: block !important;
+            }
+
+            .print-btn-float,
+            nav,
+            .top-bar,
+            footer,
+            .billing-search {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="top-bar">
+        <div class="user-info-top">
+            <span><strong>IPSM Health Care</strong></span>
+            <span>| Role: <strong>ADMIN</strong></span>
+        </div>
+        <div>
+            <span id="live-time" style="margin-right: 15px;"></span>
+            <form action="/logout" method="POST" style="display:inline;"
+                onsubmit="return confirm('Are you sure you want to logout?');">
+                <button type="submit" class="logout-link"
+                    style="background:none; border:none; color:inherit; font-weight:600; cursor:pointer; padding:0; font-size: 0.85rem; color:#b91c1c;">Logout</button>
+            </form>
+        </div>
+    </div>
+
+    <nav>
+        <div class="logo">
+            <i class="fa-solid fa-stethoscope"></i>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Dashboard</a></li>
+            <li class="dropdown">
+                <a href="#">Registration <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem;"></i></a>
+                <ul class="dropdown-menu">
+                    <li><a href="registration.html">New Registration</a></li>
+                    <li><a href="manage-patients.html">Manage Patient</a></li>
+                </ul>
+            </li>
+            <li class="dropdown">
+                <a href="#">Reports <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem;"></i></a>
+                <ul class="dropdown-menu">
+                    <li><a href="#">Back Date Outstanding Report</a></li>
+                    <li><a href="#">Invoice Month Wise Summary Report</a></li>
+                    <li><a href="#">Ledger Transaction</a></li>
+                    <li><a href="#">Sales Business Report</a></li>
+                    <li><a href="#">Sales Report</a></li>
+                </ul>
+            </li>
+            <li><a href="patient-report.html">Patient Report</a></li>
+            <li><a href="billing.html" class="active">Billing</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="billing-interface">
+            <h1 style="margin-bottom: 20px; color: var(--primary-color);">
+                IPSM Health Care
+            </h1>
+
+            <div class="billing-search">
+                <i class="fa-solid fa-magnifying-glass" style="color: #64748b;"></i>
+                <input type="text" id="billing-search-input"
+                    placeholder="Enter Patient ID, Name, or Mobile to generate bill..."
+                    oninput="searchPatientsForBilling()">
+            </div>
+
+            <div id="search-results" style="margin-bottom: 20px;">
+                <table class="patient-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 120px;">Patient ID</th>
+                            <th>Patient Name</th>
+                            <th>Mobile</th>
+                            <th>Reg Date</th>
+                            <th class="text-right">Total</th>
+                            <th class="text-right">Balance</th>
+                            <th style="width: 150px; text-align: center;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-tbody">
+                        <tr>
+                            <td colspan="7" style="text-align:center">Loading registrations...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Invoice Preview - Using Receipt Image Background Overlays -->
+            <div id="invoice-to-print" class="invoice-preview">
+                <div class="row-line-top"></div>
+                <!-- Receipt Info row 1 -->
+                <div class="overlay-data receipt-no"><strong>Receipt No:</strong> <span id="bill-reg-no">--</span></div>
+                <div class="overlay-data receipt-date"><strong>Date:</strong> <span id="bill-date">--</span></div>
+                <div class="overlay-data receipt-time"><strong>Time:</strong> <span id="bill-time">--</span></div>
+
+                <!-- row 2 -->
+                <div class="overlay-data p-date"><strong>Date:</strong> <span id="bill-reg-date">--</span></div>
+                <div class="overlay-data p-srl"><strong>Srl No.</strong> 0165</div>
+                <div class="overlay-data p-id"><strong>Patient ID:</strong> <span id="bill-p-id">--</span></div>
+
+                <!-- row 3 -->
+                <div class="overlay-data p-name"><strong>Name:</strong> <span id="bill-p-name">--</span></div>
+                <div class="overlay-data p-age"><strong>Age:</strong> <span id="bill-p-age">--</span></div>
+                <div class="overlay-data p-sex"><strong>Sex:</strong> <span id="bill-p-sex">--</span></div>
+
+                <!-- row 4 -->
+                <div class="overlay-data p-ref"><strong>Ref.By:</strong> <span id="bill-p-ref">Self</span></div>
+
+                <!-- Table Header and Items overlay -->
+                <div class="items-area">
+                    <div class="items-header">
+                        <div style="width: 50px;">Sr.</div>
+                        <div style="flex-grow: 1;">Particular</div>
+                        <div style="width: 120px; text-align: right; white-space: nowrap;">Charges (Rs)</div>
+                    </div>
+                    <div id="bill-items-container">
+                        <!-- Rows will be injected here -->
+                    </div>
+                </div>
+
+                <!-- Summary Rows -->
+                <div class="summary-row total-row">
+                    <strong>Total</strong>
+                    <span class="val-align" id="bill-total">0/-</span>
+                </div>
+                <div class="summary-row discount-row">
+                    <strong>Discount</strong>
+                    <span class="val-align" id="bill-discount">0/-</span>
+                </div>
+                <div class="summary-row paid-row" style="color: #7b1f5e; font-weight: 800;">
+                    <strong>Amount to be Paid</strong>
+                    <span class="val-align" id="bill-balance" style="font-size: 1.2rem;">0/-</span>
+                </div>
+
+                <!-- Thank You Note overlay -->
+                <div class="overlay-data thanks-note-overlay">
+                    <strong>Received with thanks a sum of Rs.<span id="bill-final-words">--</span> By Online(Google Pay)
+                        on A/c of Solicitous Wellness.</strong>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <button class="print-btn-float" onclick="window.print()" title="Print Invoice" id="print-float"
+        style="display: none;">
+        <i class="fa-solid fa-print"></i>
+    </button>
+
+    <script>
+        let allRegs = [];
+
+        async function fetchAll() {
+            try {
+                const response = await fetch('/api/registrations');
+                allRegs = await response.json();
+                renderBillingTable(allRegs);
+            } catch (e) {
+                console.error(e);
+                const tbody = document.getElementById('results-tbody');
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:red">Error loading data.</td></tr>`;
+            }
+        }
+
+        function renderBillingTable(data) {
+            const tbody = document.getElementById('results-tbody');
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center">No records found</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = data.map(r => `
+                <tr>
+                    <td><strong>IPSM/${2000 + r.regId}</strong></td>
+                    <td>${r.patient.patientName}</td>
+                    <td>${r.patient.mobile}</td>
+                    <td>${new Date(r.regDate).toLocaleDateString('en-IN')}</td>
+                    <td class="text-right">₹${r.totalAmount.toFixed(2)}</td>
+                    <td class="text-right" style="color: ${r.balanceAmount > 0 ? '#b91c1c' : '#166534'}; font-weight:700">₹${r.balanceAmount.toFixed(2)}</td>
+                    <td style="text-align: center;">
+                        <button class="btn btn-primary" style="padding: 5px 12px; font-size:0.8rem;" onclick="generateInvoice(${r.regId})">
+                            <i class="fa-solid fa-file-invoice"></i> Generate Bill
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function searchPatientsForBilling() {
+            const query = document.getElementById('billing-search-input').value.toLowerCase();
+            const filtered = allRegs.filter(r =>
+                r.patient.patientName.toLowerCase().includes(query) ||
+                r.patient.mobile.includes(query) ||
+                `IPSM/${2000 + r.regId}`.toLowerCase().includes(query)
+            );
+            renderBillingTable(filtered);
+        }
+
+        function numberToWords(num) {
+            if (num === 0) return 'Zero';
+            const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+            const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
+            const convert = (n) => {
+                if (n < 20) return ones[n];
+                if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 !== 0 ? ' ' + ones[n % 10] : '');
+                if (n < 1000) return ones[Math.floor(n / 100)] + ' Hundred' + (n % 100 !== 0 ? ' and ' + convert(n % 100) : '');
+                return '';
+            }
+            return convert(num) + ' Rupees Only';
+        }
+
+        function generateInvoice(id) {
+            const reg = allRegs.find(r => r.regId === id);
+            if (!reg) return;
+
+            const now = new Date();
+            const regDate = new Date(reg.regDate);
+
+            // Fill Data (Matches overlay IDs)
+            document.getElementById('bill-reg-no').textContent = String(reg.regId).padStart(4, '0');
+            // Correct Date: Use today's date
+            const todayStr = now.toLocaleDateString('en-IN');
+            document.getElementById('bill-date').textContent = todayStr;
+            // Correct Time: Use 12-hour format
+            document.getElementById('bill-time').textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+            document.getElementById('bill-reg-date').textContent = todayStr;
+            document.getElementById('bill-p-id').textContent = `IPSM/${2000 + reg.regId}`;
+
+            document.getElementById('bill-p-name').textContent = reg.patient.patientName;
+            document.getElementById('bill-p-age').textContent = `${reg.patient.age} Yrs`;
+            document.getElementById('bill-p-sex').textContent = reg.patient.gender;
+            document.getElementById('bill-p-ref').textContent = reg.reference || 'Self';
+
+            // Items Overlay dynamic logic
+            const itemsContainer = document.getElementById('bill-items-container');
+            let itemsHtml = '';
+
+            try {
+                const investigations = reg.investigations ? JSON.parse(reg.investigations) : [];
+                if (investigations.length > 0) {
+                    investigations.forEach((item, index) => {
+                        const netAmt = item.mrp - (item.disc || 0);
+                        itemsHtml += `
+                            <div class="item-row">
+                                <div style="width: 50px;">${String(index + 1).padStart(2, '0')}</div>
+                                <div style="flex-grow: 1;">${item.testName}</div>
+                                <div style="width: 120px; text-align: right; font-weight: 700;">${Math.round(netAmt)}/-</div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    itemsHtml = `
+                        <div class="item-row">
+                            <div style="width: 50px;">01</div>
+                            <div style="flex-grow: 1;">Consultation / General Investigations</div>
+                            <div style="width: 120px; text-align: right; font-weight: 700;">${(reg.totalAmount || 0).toFixed(0)}/-</div>
+                        </div>
+                    `;
+                }
+            } catch (e) {
+                console.error("Error parsing investigations", e);
+                itemsHtml = `
+                    <div class="item-row">
+                        <div style="width: 50px;">01</div>
+                        <div style="flex-grow: 1;">Consultation / General Investigations</div>
+                        <div style="width: 120px; text-align: right; font-weight: 700;">${(reg.totalAmount || 0).toFixed(0)}/-</div>
+                    </div>
+                `;
+            }
+            itemsContainer.innerHTML = itemsHtml;
+
+            document.getElementById('bill-total').textContent = `${(reg.totalAmount || 0).toFixed(0)}/-`;
+            document.getElementById('bill-discount').textContent = `${(reg.discountAmount || 0).toFixed(0)}/-`;
+            document.getElementById('bill-balance').textContent = `${(reg.paidAmount || 0).toFixed(0)}/-`;
+
+            // Note area
+            const paidAmt = Math.round(reg.paidAmount || 0);
+            document.getElementById('bill-final-words').textContent = `${paidAmt}/- From ${reg.patient.patientName.toUpperCase()}`;
+            // (Note: The thanks note text is mostly static in the HTML, we just fill the dynamic parts)
+
+            // Trigger Print Popup
+            setTimeout(() => {
+                window.print();
+            }, 300);
+        }
+
+        // Live Time
+        setInterval(() => {
+            const now = new Date();
+            const timeEl = document.getElementById('live-time');
+            if (timeEl) timeEl.textContent = now.toLocaleString();
+        }, 1000);
+
+        window.onload = fetchAll;
+    </script>
+</body>
+
+</html>

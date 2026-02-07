@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Registration | HealthCare</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --label-width: 110px;
+            --input-height: 32px;
+            --primary-pink: #b71677;
+            --medical-red: #b91c1c;
+            --border-color: #cbd5e1;
+        }
+
+        .registration-container {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            color: var(--medical-red);
+            font-size: 1rem;
+            font-weight: 700;
+            border-bottom: 2px solid #fee2e2;
+            margin: 25px 0 15px 0;
+            padding-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-header:first-child {
+            margin-top: 0;
+        }
+
+        /* Form Layout */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px 40px;
+            margin-bottom: 15px;
+        }
+
+        .field-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: var(--input-height);
+        }
+
+        .field-label {
+            width: var(--label-width);
+            min-width: var(--label-width);
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #475569;
+            text-align: right;
+            line-height: 1.2;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            height: 100%;
+        }
+
+        .input-control {
+            height: var(--input-height);
+            padding: 0 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.9rem;
+            flex-grow: 1;
+            outline: none;
+            width: 100%;
+        }
+
+        .input-control:focus {
+            border-color: var(--primary-pink);
+            box-shadow: 0 0 0 2px rgba(183, 22, 119, 0.1);
+        }
+
+        /* Combined Controls */
+        .flex-group {
+            display: flex;
+            gap: 5px;
+            flex-grow: 1;
+        }
+
+        .input-sm {
+            width: 70px !important;
+            flex-grow: 0 !important;
+        }
+
+        .input-md {
+            width: 100px !important;
+            flex-grow: 0 !important;
+        }
+
+        .mobile-field {
+            display: flex;
+            flex-grow: 1;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            height: var(--input-height);
+        }
+
+        .prefix {
+            background: #f1f5f9;
+            padding: 0 10px;
+            display: flex;
+            align-items: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .mobile-field input {
+            border: none;
+            height: 100%;
+            padding: 0 10px;
+            flex-grow: 1;
+            outline: none;
+        }
+
+        /* Investigation Box */
+        .investigation-panel {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .category-row {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 15px;
+            padding-left: calc(var(--label-width) + 10px);
+        }
+
+        .cat-option {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #334155;
+            cursor: pointer;
+        }
+
+        /* Split Layout for Investigations */
+        .investigation-split-container {
+            display: grid;
+            grid-template-columns: 45% 55%;
+            gap: 15px;
+            margin-top: 20px;
+            min-height: 400px;
+        }
+
+        .side-panel {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background: #f8fafc;
+            padding: 10px 15px;
+            border-bottom: 1px solid #e2e8f0;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #1e293b;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .scroll-area {
+            flex-grow: 1;
+            overflow-y: auto;
+            max-height: 450px;
+        }
+
+        .compact-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        .compact-table th {
+            position: sticky;
+            top: 0;
+            background: #3b82f6;
+            color: white;
+            padding: 8px 10px;
+            text-align: left;
+            z-index: 10;
+        }
+
+        .compact-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .compact-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .remove-btn {
+            color: #ef4444;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .add-btn {
+            color: #22c55e;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .total-section {
+            padding: 15px;
+            background: #f8fafc;
+            border-top: 2px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        /* Payment Section */
+        .payment-panel {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-top: 2px solid #b91c1c;
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        .payment-header {
+            color: #b91c1c;
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+        }
+
+        .payment-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .mode-btn {
+            padding: 4px 15px;
+            border-radius: 4px;
+            border: 1px solid #cbd5e1;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .btn-cash {
+            background-color: #fef9c3;
+            color: #854d0e;
+        }
+
+        .btn-card {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .btn-upi {
+            background-color: #f3e8ff;
+            color: #6b21a8;
+        }
+
+        .payment-field {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .payment-input {
+            width: 70px;
+            height: 28px;
+            border: 1px solid #cbd5e1;
+            border-radius: 3px;
+            padding: 0 5px;
+            outline: none;
+        }
+
+        .bal-amt {
+            color: #1d4ed8;
+            font-weight: 800;
+            font-size: 1rem;
+        }
+
+        .payment-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 0.8rem;
+        }
+
+        .payment-table th {
+            background: #3b82f6;
+            color: white;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .payment-table td {
+            padding: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        @media (max-width: 1000px) {
+            .investigation-split-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="top-bar">
+        <div class="user-info-top">
+            <span>Center:
+                <select style="padding: 2px;">
+                    <option>Main Healthcare Center</option>
+                </select>
+            </span>
+            <span style="font-weight: 700; font-size: 1.1rem; margin-left: 30px;">Patient Registration</span>
+        </div>
+        <div>
+            <span id="live-time" style="font-size: 0.85rem; font-weight: 600;"></span>
+            <span style="font-size: 0.75rem; margin-left: 15px;">Last Lab No: 0255925121800006</span>
+            <button class="btn btn-gray" style="margin-left: 10px; height: 26px; font-size: 0.7rem;">Upload
+                Document</button>
+            <form action="/logout" method="POST" style="display:inline; margin-left:15px;"
+                onsubmit="return confirm('Are you sure you want to logout?');">
+                <button type="submit" class="logout-link"
+                    style="background:none; border:none; color:inherit; font-weight:600; cursor:pointer; padding:0; font-size: 0.85rem; color:#b91c1c;">Logout</button>
+            </form>
+        </div>
+    </div>
+
+    <nav>
+        <div class="logo">
+            <i class="fa-solid fa-stethoscope"></i>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Dashboard</a></li>
+            <li class="dropdown">
+                <a href="#" class="active">Registration <i class="fa-solid fa-chevron-down"
+                        style="font-size: 0.7rem;"></i></a>
+                <ul class="dropdown-menu">
+                    <li><a href="registration.html">New Registration</a></li>
+                    <li><a href="manage-patients.html">Manage Patient</a></li>
+                </ul>
+            </li>
+            <li class="dropdown">
+                <a href="#">Reports <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem;"></i></a>
+                <ul class="dropdown-menu">
+                    <li><a href="#">Back Date Outstanding Report</a></li>
+                    <li><a href="#">Invoice Month Wise Summary Report</a></li>
+                    <li><a href="#">Ledger Transaction</a></li>
+                    <li><a href="#">Sales Business Report</a></li>
+                    <li><a href="#">Sales Report</a></li>
+                </ul>
+            </li>
+            <li><a href="patient-report.html">Patient Report</a></li>
+            <li><a href="billing.html">Billing</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="registration-container">
+            <div class="section-header">Patient Info</div>
+
+            <div class="form-row">
+                <!-- Name Row -->
+                <div class="field-group">
+                    <label class="field-label">Patient Name:</label>
+                    <div class="flex-group">
+                        <select id="p-salutation" class="input-control input-md">
+                            <option>Mr.</option>
+                            <option>Ms.</option>
+                            <option>Mrs.</option>
+                            <option>Baby</option>
+                            <option>Master</option>
+                        </select>
+                        <input type="text" id="p-name" class="input-control" placeholder="First & Last Name"
+                            onchange="checkDuplicatePatient()">
+                    </div>
+                </div>
+                <!-- Reg No Row -->
+                <div class="field-group">
+                    <label class="field-label">Reg No.:</label>
+                    <div class="flex-group">
+                        <input type="text" id="reg-no" class="input-control" value="Loading..." readonly
+                            style="background:#f8fafc">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <!-- Age/DOB Row -->
+                <div class="field-group">
+                    <label class="field-label">Date of Birth:</label>
+                    <input type="date" id="p-dob" class="input-control" onchange="updateAgeFromDOB()"
+                        onclick="this.showPicker()">
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Age:</label>
+                    <div class="flex-group">
+                        <input type="number" id="p-age" class="input-control" placeholder="Age"
+                            oninput="clearDOBOnAgeInput()">
+                        <select id="p-age-unit" class="input-control input-sm">
+                            <option>YRS</option>
+                            <option>MTH</option>
+                            <option>DAYS</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <!-- Gender/Status Row -->
+                <div class="field-group">
+                    <label class="field-label">Gender:</label>
+                    <select id="p-gender" class="input-control" onchange="autoUpdateSalutation()">
+                        <option>Male</option>
+                        <option>Female</option>
+                        <option>Others</option>
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Marital Status:</label>
+                    <select id="p-status" class="input-control" onchange="autoUpdateSalutation()">
+                        <option>Single</option>
+                        <option>Married</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <!-- Mobile Row -->
+                <div class="field-group">
+                    <label class="field-label" style="color:red">Mobile No:</label>
+                    <div class="mobile-field">
+                        <span class="prefix">+91</span>
+                        <input type="text" id="p-mobile" placeholder="10 Digit Number" maxlength="10"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)"
+                            onchange="checkDuplicatePatient()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="field-group">
+                    <label class="field-label">Address:</label>
+                    <input type="text" id="p-address" class="input-control" placeholder="Complete Patient Address">
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Email ID:</label>
+                    <input type="email" id="p-email" class="input-control" placeholder="Email">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="field-group">
+                    <label class="field-label">Refer Doctor:</label>
+                    <input type="text" id="p-refer-doctor" class="input-control" placeholder="Search Doctor">
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Source:</label>
+                    <select id="p-ref-select" class="input-control">
+                        <option>Walking</option>
+                        <option>Online</option>
+                        <option>Refer by Doctor</option>
+                        <option>Through Camp</option>
+                        <option>Reference</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="section-header" style="color:#1e3a8a; border-bottom-color:#dbeafe">Investigation</div>
+
+            <div class="investigation-panel">
+                <div class="category-row">
+                    <label class="cat-option"><input type="radio" name="c" value="Pathology" checked> Pathology</label>
+                    <label class="cat-option"><input type="radio" name="c" value="Dental"> Dental</label>
+                    <label class="cat-option"><input type="radio" name="c" value="Physiotherapy"> Physiotherapy</label>
+                    <label class="cat-option"><input type="radio" name="c" value="Radiology"> Radiology</label>
+                </div>
+
+                <!-- Radiology Sub-categories (Hidden by default) -->
+                <div id="radiology-sub-row" class="category-row"
+                    style="display: none; padding-left: 240px; margin-top: -8px; border-top: none; gap: 15px;">
+                    <label class="cat-option" style="font-size: 0.85rem;"><input type="radio" name="sc" value="X-Ray">
+                        X-Ray</label>
+                    <label class="cat-option" style="font-size: 0.85rem;"><input type="radio" name="sc" value="CT Scan">
+                        CT Scan</label>
+                    <label class="cat-option" style="font-size: 0.85rem;"><input type="radio" name="sc" value="MRI">
+                        MRI</label>
+                    <label class="cat-option" style="font-size: 0.85rem;"><input type="radio" name="sc"
+                            value="Ultrasound"> Ultrasound</label>
+                </div>
+
+                <div class="form-row">
+                    <div class="field-group">
+                        <label class="field-label">Search Doctor:</label>
+                        <div class="flex-group">
+                            <input type="text" class="input-control" placeholder="Doctor name">
+                            <button class="btn btn-gray">Select Doctor</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="investigation-split-container">
+                <!-- Left Side: Available Tests -->
+                <div class="side-panel">
+                    <div class="panel-header"
+                        style="flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px 15px;">
+                        <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                            <span>Available Investigations</span>
+                            <span id="available-count"
+                                style="font-size: 0.75rem; font-weight: normal; color: #64748b;">Showing: 0</span>
+                        </div>
+                        <div style="width: 100%; position: relative;">
+                            <i class="fa-solid fa-magnifying-glass"
+                                style="position: absolute; left: 10px; top: 10px; color: #94a3b8; font-size: 0.8rem;"></i>
+                            <input type="text" class="input-control" placeholder="Search test name or code..."
+                                style="padding-left: 30px; height: 32px; width: 100%; font-size: 0.8rem;">
+                        </div>
+                    </div>
+                    <div class="scroll-area">
+                        <table class="compact-table" id="available-tests-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px;">Add</th>
+                                    <th style="width: 80px;">Code</th>
+                                    <th>Investigation Name</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Right Side: Selected Tests (Cart) -->
+                <div class="side-panel">
+                    <div class="panel-header">
+                        <span>Selected Tests</span>
+                        <span id="selected-count"
+                            style="font-size: 0.75rem; font-weight: normal; color: #64748b;">Selected: 0</span>
+                    </div>
+                    <div class="scroll-area">
+                        <table class="compact-table" id="selected-tests-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px;">Sr.</th>
+                                    <th>Test Name</th>
+                                    <th style="width: 70px;">MRP</th>
+                                    <th style="width: 60px;">Disc.</th>
+                                    <th style="width: 80px;">Net Amt</th>
+                                    <th style="width: 40px;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="total-section">
+                        <span>Total Items: <span id="total-items">0</span></span>
+                        <span style="color: #1e293b;">Total Amount: <span id="grand-total">₹0.00</span></span>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="payment-panel">
+                <div class="payment-header">Payment Detail</div>
+                <div class="payment-controls">
+                    <button class="mode-btn btn-cash" onclick="addPayment('CASH')">CASH</button>
+                    <button class="mode-btn btn-card" onclick="addPayment('CARD')">CARD</button>
+                    <button class="mode-btn btn-upi" onclick="addPayment('UPI')">UPI</button>
+
+                    <div class="payment-field" style="margin-left: 20px;">
+                        <span>Total:</span>
+                        <input type="text" id="pay-total" class="payment-input" readonly style="background:#e2e8f0">
+                    </div>
+                    <div class="payment-field">
+                        <span>Disc %:</span>
+                        <input type="number" id="pay-disc-perc" class="payment-input" value="0"
+                            oninput="calculatePayment()">
+                    </div>
+                    <div class="payment-field">
+                        <span>Disc Amt:</span>
+                        <input type="number" id="pay-disc-amt" class="payment-input" value="0"
+                            oninput="calculatePayment(true)">
+                    </div>
+                    <div class="payment-field" style="margin-left: 10px;">
+                        <span>BalAmt:</span>
+                        <span id="pay-bal" class="bal-amt">0.00</span>
+                    </div>
+                </div>
+
+                <table class="payment-table" id="payment-history">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;">#</th>
+                            <th style="width: 120px;">Payment Mode</th>
+                            <th style="width: 150px;">Amount</th>
+                            <th>Payment Details</th>
+                            <th>Remarks</th>
+                            <th style="width: 60px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows added dynamically -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="margin-top:25px; display:flex; justify-content:flex-end; gap:15px;">
+                <button class="btn btn-danger" style="width:120px">Clear Form</button>
+                <button class="btn btn-primary" style="width:180px" onclick="saveRegistration()">Save
+                    Registration</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Healthcare Management System. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        // Global state for selected tests
+        let allAvailableTests = [];
+        let selectedTests = [];
+
+        // Update live time
+        function updateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const dateStr = now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+            document.getElementById('live-time').textContent = `${dateStr} | ${timeStr}`;
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // Age/DOB Logic
+        function updateAgeFromDOB() {
+            const dobEl = document.getElementById('p-dob');
+            const ageEl = document.getElementById('p-age');
+            if (dobEl.value) {
+                const dob = new Date(dobEl.value);
+                const today = new Date();
+                let age = today.getFullYear() - dob.getFullYear();
+                const m = today.getMonth() - dob.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+                    age--;
+                }
+                ageEl.value = age >= 0 ? age : 0;
+                autoUpdateSalutation();
+            }
+        }
+
+        async function checkDuplicatePatient() {
+            const name = document.getElementById('p-name').value;
+            const mobile = document.getElementById('p-mobile').value;
+            const dob = document.getElementById('p-dob').value;
+
+            if (name && mobile && dob) {
+                try {
+                    const response = await fetch(`/api/check-duplicate?name=${encodeURIComponent(name)}&mobile=${encodeURIComponent(mobile)}&dob=${dob}`);
+                    const isDuplicate = await response.json();
+                    if (isDuplicate) {
+                        alert("⚠️ This patient is already registered (name, mobile, and DOB match).");
+                    }
+                } catch (e) {
+                    console.error("Duplicate check failed", e);
+                }
+            }
+        }
+
+        function clearDOBOnAgeInput() {
+            const dobEl = document.getElementById('p-dob');
+            if (document.getElementById('p-age').value !== '') {
+                dobEl.value = '';
+            }
+            autoUpdateSalutation();
+        }
+
+        function autoUpdateSalutation() {
+            const age = parseInt(document.getElementById('p-age').value) || 0;
+            const gender = document.getElementById('p-gender').value;
+            const status = document.getElementById('p-status').value;
+            const saltEl = document.getElementById('p-salutation');
+
+            if (age < 12) {
+                if (gender === 'Female') saltEl.value = 'Baby';
+                else saltEl.value = 'Master';
+            } else {
+                if (gender === 'Male') {
+                    saltEl.value = 'Mr.';
+                } else if (gender === 'Female') {
+                    if (status === 'Married') saltEl.value = 'Mrs.';
+                    else saltEl.value = 'Ms.';
+                }
+            }
+        }
+
+
+        // Database Integration: Fetch Tests
+        async function fetchTests(category = 'Pathology') {
+            try {
+                // For demo/dev purposes, if API fails, we use mock data
+                let tests = [];
+                try {
+                    const response = await fetch(`/api/tests?category=${category}`);
+                    if (response.ok) {
+                        tests = await response.json();
+                    } else {
+                        throw new Error('API not available');
+                    }
+                } catch (e) {
+                    console.warn('API fetch failed, using mock data for demo');
+                    tests = getMockTests(category);
+                }
+
+                allAvailableTests = tests;
+                renderAvailableTests(tests);
+            } catch (error) {
+                console.error('Error in fetchTests:', error);
+            }
+        }
+
+        function renderAvailableTests(tests) {
+            const tbody = document.querySelector('#available-tests-table tbody');
+            document.getElementById('available-count').textContent = `Showing: ${tests.length}`;
+
+            if (tests.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:20px; color:#94a3b8">No tests found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = tests.map(test => {
+                const isSelected = selectedTests.some(s => s.testCode === test.testCode);
+                return `
+                    <tr class="${isSelected ? 'selected-row' : ''}">
+                        <td style="text-align:center">
+                            <i class="fa-solid ${isSelected ? 'fa-check-circle' : 'fa-circle-plus'} add-btn" 
+                               style="${isSelected ? 'color:#22c55e' : ''}"
+                               onclick="toggleTest('${test.testCode}')"></i>
+                        </td>
+                        <td>${test.testCode}</td>
+                        <td style="font-weight:500">${test.testName}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function toggleTest(code) {
+            const test = allAvailableTests.find(t => t.testCode === code);
+            if (!test) return;
+
+            const index = selectedTests.findIndex(s => s.testCode === code);
+            if (index === -1) {
+                selectedTests.push({ ...test, disc: 0 });
+            } else {
+                selectedTests.splice(index, 1);
+            }
+
+            renderAvailableTests(allAvailableTests);
+            renderSelectedTests();
+        }
+
+        function renderSelectedTests() {
+            const tbody = document.querySelector('#selected-tests-table tbody');
+            document.getElementById('selected-count').textContent = `Selected: ${selectedTests.length}`;
+            document.getElementById('total-items').textContent = selectedTests.length;
+
+            if (selectedTests.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color:#94a3b8">No tests selected yet.</td></tr>`;
+                updateTotals();
+                return;
+            }
+
+            tbody.innerHTML = selectedTests.map((test, index) => {
+                const netAmt = test.mrp - (test.disc || 0);
+                return `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td style="font-weight:500">${test.testName}</td>
+                        <td>₹${test.mrp.toFixed(2)}</td>
+                        <td><input type="number" value="${test.disc}" style="width:50px; border:1px solid #ddd" onchange="updateDiscount('${test.testCode}', this.value)"></td>
+                        <td style="font-weight:700">₹${netAmt.toFixed(2)}</td>
+                        <td style="text-align:center">
+                            <i class="fa-solid fa-trash-can remove-btn" onclick="toggleTest('${test.testCode}')"></i>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            updateTotals();
+        }
+
+        function updateDiscount(code, val) {
+            const test = selectedTests.find(s => s.testCode === code);
+            if (test) {
+                test.disc = parseFloat(val) || 0;
+                renderSelectedTests();
+            }
+        }
+
+        // Total Calculation Refined
+        function updateTotals() {
+            const itemsTotal = selectedTests.reduce((sum, test) => sum + (test.mrp - (test.disc || 0)), 0);
+            document.getElementById('grand-total').textContent = `₹${itemsTotal.toFixed(2)}`;
+            const payTotalEl = document.getElementById('pay-total');
+            if (payTotalEl) {
+                payTotalEl.value = itemsTotal.toFixed(2);
+                calculatePayment();
+            }
+        }
+
+        // Payment Logic
+        let paymentRecords = [];
+
+        function addPayment(mode) {
+            const balance = parseFloat(document.getElementById('pay-bal').textContent) || 0;
+            if (balance <= 0) return;
+
+            const amount = balance; // Pay full remaining by default
+            const record = {
+                mode: mode,
+                amount: amount,
+                details: '',
+                remarks: ''
+            };
+            paymentRecords.push(record);
+            renderPaymentHistory();
+        }
+
+        function renderPaymentHistory() {
+            const tbody = document.querySelector('#payment-history tbody');
+            if (!tbody) return;
+            tbody.innerHTML = paymentRecords.map((p, i) => `
+                <tr>
+                    <td>${i + 1}</td>
+                    <td style="font-weight:700">${p.mode}</td>
+                    <td><input type="number" class="payment-input" value="${p.amount}" onchange="updatePayAmount(${i}, this.value)" style="width: 100%;"></td>
+                    <td><input type="text" placeholder="Card/UPI Ref No." value="${p.details || ''}" onchange="updatePayDetails(${i}, this.value)" style="width: 100%; border:1px solid #ddd; padding:2px;"></td>
+                    <td><input type="text" placeholder="Any note..." value="${p.remarks || ''}" onchange="updatePayRemarks(${i}, this.value)" style="width: 100%; border:1px solid #ddd; padding:2px;"></td>
+                    <td style="text-align:center"><i class="fa-solid fa-trash-can remove-btn" onclick="deletePayment(${i})"></i></td>
+                </tr>
+            `).join('');
+            calculatePayment();
+        }
+
+        function deletePayment(index) {
+            paymentRecords.splice(index, 1);
+            renderPaymentHistory();
+        }
+
+        function updatePayAmount(index, val) {
+            paymentRecords[index].amount = parseFloat(val) || 0;
+            calculatePayment();
+        }
+        function updatePayDetails(index, val) { paymentRecords[index].details = val; }
+        function updatePayRemarks(index, val) { paymentRecords[index].remarks = val; }
+
+        function calculatePayment(isAmtSource = false) {
+            const totalInput = document.getElementById('pay-total');
+            if (!totalInput) return;
+
+            const total = parseFloat(totalInput.value) || 0;
+            let discPerc = parseFloat(document.getElementById('pay-disc-perc').value) || 0;
+            let discAmt = parseFloat(document.getElementById('pay-disc-amt').value) || 0;
+
+            if (isAmtSource) {
+                discPerc = total > 0 ? (discAmt / total * 100) : 0;
+                document.getElementById('pay-disc-perc').value = discPerc.toFixed(2);
+            } else {
+                discAmt = (total * discPerc / 100) || 0;
+                document.getElementById('pay-disc-amt').value = discAmt.toFixed(2);
+            }
+
+            const netPayable = total - discAmt;
+            const paid = paymentRecords.reduce((sum, p) => sum + p.amount, 0);
+            const balance = netPayable - paid;
+
+            const balEl = document.getElementById('pay-bal');
+            if (balEl) balEl.textContent = balance.toFixed(2);
+        }
+
+        // Mock Data Generator
+        function getMockTests(cat) {
+            const names = ['ACID PHOSPHATASE', 'ALBUMIN', 'ALCOHOL SCREEN', 'ALDOLASE', 'ALKALINE PHOSPHATASE', 'AMYLASE', 'ANA', 'ANCA'];
+            return names.map((name, i) => ({
+                testCode: `${cat.substring(0, 2).toUpperCase()}${100 + i}`,
+                testName: `${name} - ${cat}`,
+                mrp: 500 + (i * 150)
+            }));
+        }
+
+        // Handle Category Change
+        document.querySelectorAll('input[name="c"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const category = e.target.value;
+                const subRow = document.getElementById('radiology-sub-row');
+
+                if (category === 'Radiology') {
+                    subRow.style.display = 'flex';
+                    // Default to first sub-cat if none selected
+                    const firstSub = subRow.querySelector('input[name="sc"]');
+                    firstSub.checked = true;
+                    fetchTests(firstSub.value);
+                } else {
+                    subRow.style.display = 'none';
+                    fetchTests(category);
+                }
+            });
+        });
+
+        // Handle Sub-Category Change
+        document.querySelectorAll('input[name="sc"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                fetchTests(e.target.value);
+            });
+        });
+
+        // Search functionality
+        document.querySelector('input[placeholder="Search test name or code..."]').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filtered = allAvailableTests.filter(t =>
+                t.testName.toLowerCase().includes(searchTerm) ||
+                t.testCode.toLowerCase().includes(searchTerm)
+            );
+            renderAvailableTests(filtered);
+        });
+
+        // Load default tests
+        window.onload = async () => {
+            fetchTests('Pathology');
+            await checkForEdit();
+        };
+
+        async function checkForEdit() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const editId = urlParams.get('editId');
+            if (editId) {
+                document.querySelector('.section-header').textContent = "Edit Patient Info";
+                document.querySelector('.btn-primary').textContent = "Update Registration";
+
+                try {
+                    const response = await fetch(`/api/registrations/${editId}`);
+                    if (response.ok) {
+                        const reg = await response.json();
+                        populateEditForm(reg);
+                    }
+                } catch (e) {
+                    console.error("Failed to fetch registration for edit", e);
+                }
+            } else {
+                fetchNextRegNo();
+            }
+        }
+
+        function populateEditForm(reg) {
+            document.getElementById('reg-no').value = `IPSM/${2000 + reg.regId}`;
+            document.getElementById('p-name').value = reg.patient.patientName;
+            document.getElementById('p-dob').value = reg.patient.birthDate;
+            document.getElementById('p-age').value = reg.patient.age;
+            document.getElementById('p-gender').value = reg.patient.gender;
+            document.getElementById('p-mobile').value = reg.patient.mobile;
+
+            // Note: Since investigations and payments are nested/complex, 
+            // we'd typically map those here too. For this mock version,
+            // we focus on correctly loading the core patient details.
+        }
+
+        async function fetchNextRegNo() {
+            try {
+                const response = await fetch('/api/next-reg-no');
+                if (response.ok) {
+                    const regNo = await response.text();
+                    document.getElementById('reg-no').value = regNo;
+                }
+            } catch (e) {
+                console.warn('Failed to fetch next reg no, using fallback');
+                document.getElementById('reg-no').value = "IPSM/2001";
+            }
+        }
+
+        async function saveRegistration() {
+            const name = document.getElementById('p-name').value.trim();
+            const mobile = document.getElementById('p-mobile').value.trim();
+            const email = document.getElementById('p-email').value.trim();
+            const address = document.getElementById('p-address').value.trim();
+            const dob = document.getElementById('p-dob').value;
+            const gender = document.getElementById('p-gender').value;
+            const age = parseInt(document.getElementById('p-age').value) || 0;
+            const ageUnit = document.getElementById('p-age-unit').value;
+            const referDoctor = document.getElementById('p-refer-doctor').value.trim();
+            const refSource = document.getElementById('p-ref-select').value;
+            const finalRef = referDoctor || refSource;
+
+            if (!name || !dob || !mobile) {
+                alert("❌ Please fill all mandatory fields (Name, Mobile, DOB).");
+                return;
+            }
+
+            if (mobile.length !== 10) {
+                alert("❌ Mobile number must be exactly 10 digits.");
+                document.getElementById('p-mobile').focus();
+                return;
+            }
+
+            if (email && !/^\S+@\S+\.\S+$/.test(email)) {
+                alert("❌ Please enter a valid Email format (e.g. name@example.com).");
+                document.getElementById('p-email').focus();
+                return;
+            }
+
+            if (selectedTests.length === 0) {
+                alert("❌ Please select at least one Investigation Test.");
+                return;
+            }
+
+            const total = parseFloat(document.getElementById('pay-total').value) || 0;
+            const discAmt = parseFloat(document.getElementById('pay-disc-amt').value) || 0;
+            const paidAmt = paymentRecords.reduce((sum, p) => sum + p.amount, 0);
+            const balance = total - discAmt - paidAmt;
+
+            const payload = {
+                patient: {
+                    patientName: name,
+                    mobile: mobile,
+                    birthDate: dob,
+                    gender: gender,
+                    age: age,
+                    ageUnit: ageUnit
+                },
+                totalAmount: total,
+                discountAmount: discAmt,
+                paidAmount: paidAmt,
+                balanceAmount: balance,
+                reference: finalRef,
+                investigations: selectedTests
+            };
+
+            try {
+                const response = await fetch('/api/registrations', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    alert("✅ Registration saved successfully!");
+                    window.location.href = 'manage-patients.html';
+                } else {
+                    const errorData = await response.json().catch(() => ({}));
+                    const msg = errorData.message || "Unknown error occurred.";
+                    alert("❌ Failed to save: " + msg);
+                }
+            } catch (e) {
+                console.error(e);
+                alert("❌ Connection error: Please check if the server is running.");
+            }
+        }
+    </script>
+
+</body>
+
+</html>

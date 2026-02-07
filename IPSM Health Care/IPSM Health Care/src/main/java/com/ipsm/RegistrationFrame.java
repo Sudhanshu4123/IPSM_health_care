@@ -269,6 +269,9 @@ public class RegistrationFrame extends JFrame {
                                         java.sql.Statement.RETURN_GENERATED_KEYS)) {
                                 pstmt.setLong(1, patientId);
                                 String docName = txtReferDoctor.getText().trim();
+                                if (docName.isEmpty() && txtSearchDoctor != null) {
+                                        docName = txtSearchDoctor.getText().trim();
+                                }
                                 Integer docId = DatabaseManager.getInternalDoctorIdByName(docName);
                                 if (docId == null) {
                                         docId = DatabaseManager.getDoctorIdByName(docName);

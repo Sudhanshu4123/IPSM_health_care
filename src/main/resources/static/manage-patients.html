@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Patients | HealthCare</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .manage-container {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 15px;
+        }
+
+        .page-header h1 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            background: #f1f5f9;
+            padding: 15px 20px;
+            border-radius: 8px;
+            align-items: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .search-filters input,
+        .search-filters select {
+            height: 38px;
+            padding: 0 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            outline: none;
+            background: white;
+        }
+
+        .search-filters input {
+            min-width: 300px;
+            flex-grow: 0;
+        }
+
+        .search-filters select {
+            min-width: 150px;
+        }
+
+        .btn-filter {
+            height: 38px;
+            padding: 0 20px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-filter:hover {
+            background: var(--primary-hover);
+        }
+
+        /* Table Refinements */
+        .patient-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.9rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .patient-table th {
+            background: #f8fafc;
+            color: #475569;
+            font-weight: 700;
+            padding: 12px 10px;
+            text-align: left;
+            border-bottom: 2px solid #e2e8f0;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .patient-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .patient-table tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-paid {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-pending {
+            background: #fef9c3;
+            color: #854d0e;
+        }
+
+        .status-partial {
+            background: #e0f2fe;
+            color: #075985;
+        }
+
+        .action-icon {
+            color: var(--primary-color);
+            cursor: pointer;
+            margin-right: 10px;
+            transition: 0.2s;
+        }
+
+        .action-icon:hover {
+            color: var(--primary-hover);
+        }
+
+        .btn-new {
+            background: var(--secondary-color);
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="top-bar">
+        <div class="user-info-top">
+            <span>Center: <strong>Main Healthcare Center</strong></span>
+            <span>| Role: <strong>ADMIN</strong></span>
+        </div>
+        <div>
+            <span id="live-time"></span>
+            <form action="/logout" method="POST" style="display:inline; margin-left:15px;"
+                onsubmit="return confirm('Are you sure you want to logout?');">
+                <button type="submit" class="logout-link"
+                    style="background:none; border:none; color:inherit; font-weight:600; cursor:pointer; padding:0; font-size: 0.85rem; color:#b91c1c;">Logout</button>
+            </form>
+        </div>
+    </div>
+
+    <nav>
+        <div class="logo">
+            <i class="fa-solid fa-stethoscope"></i>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Dashboard</a></li>
+            <li class="dropdown">
+                <a href="#" class="active">Registration <i class="fa-solid fa-chevron-down"
+                        style="font-size: 0.7rem;"></i></a>
+                <ul class="dropdown-menu">
+                    <li><a href="registration.html">New Registration</a></li>
+                    <li><a href="manage-patients.html">Manage Patient</a></li>
+                </ul>
+            </li>
+            <li class="dropdown">
+                <a href="#">Reports <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem;"></i></a>
+                <ul class="dropdown-menu">
+                    <li><a href="#">Back Date Outstanding Report</a></li>
+                    <li><a href="#">Invoice Month Wise Summary Report</a></li>
+                    <li><a href="#">Ledger Transaction</a></li>
+                    <li><a href="#">Sales Business Report</a></li>
+                    <li><a href="#">Sales Report</a></li>
+                </ul>
+            </li>
+            <li><a href="patient-report.html">Patient Report</a></li>
+            <li><a href="billing.html">Billing</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="manage-container">
+            <div class="page-header">
+                <h1><i class="fa-solid fa-users-viewfinder"></i> Manage Patients</h1>
+            </div>
+
+            <div class="search-filters">
+                <i class="fa-solid fa-magnifying-glass" style="color: #64748b; margin-right: 5px;"></i>
+                <input type="text" id="patient-search" placeholder="Search by Name, ID, or Mobile...">
+                <select id="status-filter">
+                    <option value="All Status">All Status</option>
+                    <option value="Paid">Paid</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Partial">Partial</option>
+                </select>
+                <button class="btn-filter" onclick="applyFilters()">
+                    <i class="fa-solid fa-filter"></i> Apply Filter
+                </button>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table class="patient-table">
+                    <thead>
+                        <tr>
+                            <th>Patient ID</th>
+                            <th>Patient Name</th>
+                            <th>Gender / Age</th>
+                            <th>Mobile</th>
+                            <th>Email</th>
+                            <th>Reg. Date</th>
+                            <th>Total Amount</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>IPSM/2001</strong></td>
+                            <td>Rahul Sharma</td>
+                            <td>Male / 28 Yrs</td>
+                            <td>+91 9876543210</td>
+                            <td>rahul@example.com</td>
+                            <td>26-Feb-2026</td>
+                            <td>₹1,500</td>
+                            <td><span class="status-badge status-paid">Paid</span></td>
+                            <td>
+                                <i class="fa-solid fa-pen-to-square action-icon" title="Edit"></i>
+                                <i class="fa-solid fa-print action-icon" title="Print Invoice"></i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>IPSM/2002</strong></td>
+                            <td>Anita Singh</td>
+                            <td>Female / 34 Yrs</td>
+                            <td>+91 8877665544</td>
+                            <td>anita.s@gmail.com</td>
+                            <td>26-Feb-2026</td>
+                            <td>₹2,800</td>
+                            <td><span class="status-badge status-pending">Pending</span></td>
+                            <td>
+                                <i class="fa-solid fa-pen-to-square action-icon"></i>
+                                <i class="fa-solid fa-print action-icon"></i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>IPSM/2003</strong></td>
+                            <td>Amit Verma</td>
+                            <td>Male / 45 Yrs</td>
+                            <td>+91 7766554433</td>
+                            <td>amit.v@outlook.com</td>
+                            <td>25-Feb-2026</td>
+                            <td>₹450</td>
+                            <td><span class="status-badge status-partial">Partial</span></td>
+                            <td>
+                                <i class="fa-solid fa-pen-to-square action-icon"></i>
+                                <i class="fa-solid fa-print action-icon"></i>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="margin-top: 20px; color: #64748b; font-size: 0.85rem; text-align: right;">
+                Showing 3 of 1,284 patients
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Healthcare Management System. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        // Update live time
+        function updateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const dateStr = now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+            if (document.getElementById('live-time')) {
+                document.getElementById('live-time').textContent = `${dateStr} | ${timeStr}`;
+            }
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        let allRegistrations = [];
+
+        async function fetchRegistrations() {
+            try {
+                const response = await fetch('/api/registrations');
+                allRegistrations = await response.json();
+                renderTable(allRegistrations);
+            } catch (error) {
+                console.error('Error fetching registrations:', error);
+            }
+        }
+
+        function renderTable(data) {
+            const tbody = document.querySelector('.patient-table tbody');
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:30px; color:#94a3b8">No patients found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = data.map(reg => {
+                const statusClass = `status-${reg.status.toLowerCase()}`;
+                const regDate = new Date(reg.regDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+                return `
+                    <tr>
+                        <td><strong>IPSM/${2000 + reg.regId}</strong></td>
+                        <td>${reg.patient.patientName}</td>
+                        <td>${reg.patient.gender} / ${reg.patient.age} ${reg.patient.ageUnit}</td>
+                        <td>${reg.patient.mobile}</td>
+                        <td>${reg.patient.email || 'N/A'}</td>
+                        <td>${regDate}</td>
+                        <td>₹${reg.totalAmount}</td>
+                        <td><span class="status-badge ${statusClass}">${reg.status}</span></td>
+                        <td>
+                            <i class="fa-solid fa-pen-to-square action-icon" title="Edit" onclick="editRegistration(${reg.regId})"></i>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function editRegistration(id) {
+            window.location.href = `registration.html?editId=${id}`;
+        }
+
+        function applyFilters() {
+            const searchTerm = document.getElementById('patient-search').value.toLowerCase();
+            const statusTerm = document.getElementById('status-filter').value;
+
+            const filtered = allRegistrations.filter(reg => {
+                const matchesSearch =
+                    reg.patient.patientName.toLowerCase().includes(searchTerm) ||
+                    reg.patient.mobile.includes(searchTerm) ||
+                    `IPSM/${2000 + reg.regId}`.toLowerCase().includes(searchTerm);
+
+                const matchesStatus = (statusTerm === 'All Status') || (reg.status === statusTerm);
+
+                return matchesSearch && matchesStatus;
+            });
+
+            renderTable(filtered);
+        }
+
+        document.getElementById('patient-search').addEventListener('input', applyFilters);
+        document.getElementById('status-filter').addEventListener('change', applyFilters);
+
+        window.onload = fetchRegistrations;
+    </script>
+</body>
+
+</html>
